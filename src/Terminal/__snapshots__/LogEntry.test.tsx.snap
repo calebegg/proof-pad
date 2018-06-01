@@ -1,0 +1,78 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Renders big outputs 1`] = `
+<div>
+  <div
+    style={
+      Object {
+        "maxHeight": 100,
+        "overflow": "hidden",
+      }
+    }
+  >
+    <span
+      className="display"
+    >
+      &lt;
+       
+    </span>
+    bye
+  </div>
+  <div>
+    <button
+      className="show-more"
+      onClick={[Function]}
+    >
+      Show more...
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Renders inputs 1`] = `
+<div>
+  <div
+    style={
+      Object {
+        "maxHeight": "",
+        "overflow": "hidden",
+      }
+    }
+  >
+    <span
+      className="display"
+    >
+      &gt;
+       
+    </span>
+    hi
+  </div>
+  <div>
+    
+  </div>
+</div>
+`;
+
+exports[`Renders small outputs 1`] = `
+<div>
+  <div
+    style={
+      Object {
+        "maxHeight": "",
+        "overflow": "hidden",
+      }
+    }
+  >
+    <span
+      className="display"
+    >
+      &lt;
+       
+    </span>
+    bye
+  </div>
+  <div>
+    
+  </div>
+</div>
+`;
