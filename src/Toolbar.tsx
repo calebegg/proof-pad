@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
- import * as React from "react";
+import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Dispatch } from "redux";
 import { State, recordOutput } from "./reducer";
