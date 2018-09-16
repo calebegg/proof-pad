@@ -19,10 +19,10 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { evaluate, listenForUnhandledError } from "../acl2";
 import { connect } from "react-redux";
-import { State, recordInput, recordOutput } from "../reducer";
+import { State, recordInput, recordOutput, LogKind } from "../reducer";
 import { Dispatch } from "redux";
 import { InputField } from "./InputField";
-import { LogEntry, Kind } from "./LogEntry";
+import { LogEntry } from "./LogEntry";
 
 interface TerminalStore {
   log: State["log"];
@@ -50,7 +50,7 @@ class TerminalImpl extends React.Component<
       running: false,
     };
     listenForUnhandledError(error => {
-      this.props.dispatch(recordOutput(error));
+      this.props.dispatch(recordOutput({ Kind: "ERROR", Body: error }));
     });
   }
 
@@ -64,7 +64,7 @@ class TerminalImpl extends React.Component<
     try {
       this.props.dispatch(recordOutput(await evaluate(code)));
     } catch (e) {
-      this.props.dispatch(recordOutput(`Error: ${e}`));
+      this.props.dispatch(recordOutput({ Kind: "ERROR", Body: `Error: ${e}` }));
     } finally {
       this.setState({ running: false });
       if (document.activeElement === this.focusTrap) {
@@ -92,26 +92,32 @@ class TerminalImpl extends React.Component<
           }
         }}
       >
-        <pre id="output">
+        <div id="output">
           {this.props.log.map((entry, i) => (
-            <div className="log" key={i}>
+            <div
+              className={[
+                "log",
+                entry.output.kind == LogKind.ERROR ? "error" : "",
+              ].join(" ")}
+              key={i}
+            >
               {entry.input ? (
-                <LogEntry kind={Kind.INPUT} value={entry.input} />
+                <LogEntry kind={LogKind.INPUT} value={entry.input} />
               ) : (
                 ""
               )}
-              <LogEntry kind={Kind.OUTPUT} value={entry.output} />
+              <LogEntry kind={entry.output.kind} value={entry.output.value} />
             </div>
           ))}
           {this.props.pendingInput ? (
             <div className="log">
-              <LogEntry kind={Kind.INPUT} value={this.props.pendingInput} />
-              <LogEntry kind={Kind.OUTPUT} value="..." />
+              <LogEntry kind={LogKind.INPUT} value={this.props.pendingInput} />
+              <LogEntry kind={LogKind.PENDING} />
             </div>
           ) : (
             ""
           )}
-        </pre>
+        </div>
         <InputField
           onInputRef={i => {
             this.input = i;

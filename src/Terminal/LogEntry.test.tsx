@@ -16,22 +16,28 @@
  */
 
 import * as React from "react";
-import { LogEntry, Kind } from "./LogEntry";
+import { LogEntry } from "./LogEntry";
 import { create } from "react-test-renderer";
+import { LogKind } from "../reducer";
 
 test("Renders inputs", () => {
-  const c = create(<LogEntry kind={Kind.INPUT} value="hi" />);
+  const c = create(<LogEntry kind={LogKind.INPUT} value="hi" />);
+  expect(c.toJSON()).toMatchSnapshot();
+});
+
+test("Renders welcome", () => {
+  const c = create(<LogEntry kind={LogKind.WELCOME} value="hi" />);
   expect(c.toJSON()).toMatchSnapshot();
 });
 
 test("Renders small outputs", () => {
-  const c = create(<LogEntry kind={Kind.OUTPUT} value="bye" />);
+  const c = create(<LogEntry kind={LogKind.INFO} value="bye" />);
   expect(c.toJSON()).toMatchSnapshot();
 });
 
 // There's no dom, so this test can't actually check the div's height.
 test("Renders big outputs", () => {
-  const c = create(<LogEntry kind={Kind.OUTPUT} value="bye" />);
+  const c = create(<LogEntry kind={LogKind.INFO} value="bye" />);
   c.root.instance!.setState({ expanded: false });
   expect(c.toJSON()).toMatchSnapshot();
 });

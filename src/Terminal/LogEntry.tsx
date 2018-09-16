@@ -16,35 +16,54 @@
  */
 
 import * as React from "react";
+import { LogKind, showTutorial } from "../reducer";
+import { connect } from "react-redux";
 
-export enum Kind {
-  INPUT,
-  OUTPUT,
-}
+const WELCOME_MESSAGE = require("./welcome.md");
 
-export class LogEntry extends React.Component<
-  { kind: Kind; value: string },
+const KIND_TO_SYMBOL = new Map([[LogKind.ERROR, "×"], [LogKind.INPUT, ">"]]);
+
+class LogEntryImpl extends React.Component<
+  { kind: LogKind; value?: string; showTutorial: () => void },
   { expanded: boolean }
 > {
-  private elem: HTMLDivElement | null = null;
+  private elem: Element | null = null;
   state = { expanded: true };
 
   componentDidMount() {
     if (
       this.elem &&
       this.elem.clientHeight > 150 &&
-      this.props.kind === Kind.OUTPUT
+      this.props.kind !== LogKind.INPUT
     ) {
       this.setState({ expanded: false });
     }
   }
 
   render() {
+    if (this.props.kind === LogKind.WELCOME) {
+      return (
+        <div
+          dangerouslySetInnerHTML={{ __html: WELCOME_MESSAGE }}
+          ref={d => {
+            if (!d) return;
+            d.querySelector('a[href="#tutorial"]')!.addEventListener(
+              "click",
+              e => {
+                e.preventDefault();
+                this.props.showTutorial();
+              }
+            );
+          }}
+        />
+      );
+    }
     return (
-      <div
+      <pre
         ref={d => {
           this.elem = d;
         }}
+        className={this.props.kind == LogKind.ERROR ? "error" : ""}
       >
         <div
           style={{
@@ -53,9 +72,9 @@ export class LogEntry extends React.Component<
           }}
         >
           <span className="display">
-            {this.props.kind === Kind.INPUT ? ">" : "<"}&nbsp;
+            {KIND_TO_SYMBOL.get(this.props.kind) || "<"}&nbsp;&nbsp;
           </span>
-          {this.props.value}
+          {this.props.kind === LogKind.PENDING ? "..." : this.props.value}
         </div>
         <div>
           {this.state.expanded ? (
@@ -71,7 +90,13 @@ export class LogEntry extends React.Component<
             </button>
           )}
         </div>
-      </div>
+      </pre>
     );
   }
 }
+
+export const LogEntry = connect(null, dispatch => ({
+  showTutorial: () => {
+    dispatch(showTutorial());
+  },
+}))(LogEntryImpl);

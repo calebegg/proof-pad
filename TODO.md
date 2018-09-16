@@ -2,7 +2,7 @@
 
 ## MVP
 
-[ ] Experiment with timeouts
+[x] Experiment with timeouts
 [ ] Load testing
 
 ## Post-MVP?
@@ -18,5 +18,5 @@
 
 ## Monitoring
 
-[ ] Flesh out 'health' page
-[ ] Stackdriver logging
+[x] Flesh out 'health' page
+[x] Stackdriver logging

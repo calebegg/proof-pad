@@ -1,0 +1,6 @@
+node_modules/*
+dist/*
+acl2_image/*
+acl2_image_linux/*
+.DS_Store
+gin-bin

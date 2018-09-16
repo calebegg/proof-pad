@@ -39,6 +39,18 @@ module.exports = {
         loader: "awesome-typescript-loader",
       },
       { enforce: "pre", test: /\.js$/, loader: "source-map-loader" },
+      {
+        test: /\.md$/,
+        use: [
+          {
+            loader: "html-loader",
+          },
+          {
+            loader: "markdown-loader",
+            options: {},
+          },
+        ],
+      },
     ],
   },
 

@@ -33,11 +33,11 @@ export class InputField extends React.Component<
 
   private handleKeyShortcuts(e: React.KeyboardEvent<HTMLInputElement>) {
     switch (e.which) {
-      case 38:
+      case 38: // up
         if (this.historyIdx >= this.props.log.length) return;
         this.historyIdx++;
         break;
-      case 40:
+      case 40: // down
         if (this.historyIdx === 1) return;
         this.historyIdx--;
         break;
@@ -57,9 +57,10 @@ export class InputField extends React.Component<
           e.preventDefault();
           this.props.onSubmit(this.state.code);
           this.setState({ code: "" });
+          this.historyIdx = 0;
         }}
       >
-        <span className="display">&gt;&nbsp;</span>
+        <span className="display">{">"}&nbsp;&nbsp;</span>
         <input
           ref={i => {
             this.props.onInputRef(i!);
@@ -72,6 +73,7 @@ export class InputField extends React.Component<
           onKeyDown={e => this.handleKeyShortcuts(e)}
           value={this.state.code}
           disabled={this.props.running}
+          autoFocus
         />
         <div
           ref={f => {

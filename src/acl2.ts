@@ -15,19 +15,35 @@
  * limitations under the License.
  */
 
-import {WebSocket} from './websocket';
+import { WebSocket } from "./websocket";
 
-const ws = new WebSocket(`ws:35.227.97.92/acl2`);
-const queue: Array<[(v: string) => void, (v: {}) => void]> = [];
-
-function defaultCallback(e: {}) {
-  console.warn('No handler for', e);
+export interface Acl2Response {
+  Kind: string;
+  Body: string;
 }
 
+//const ws = new WebSocket(`ws:35.227.97.92/acl2`);
+let ws: WebSocket;
+let queue: Array<[(v: Acl2Response) => void, (v: {}) => void]>;
 let unhandledErrorCallback: (e: string) => void = defaultCallback;
 
+export function reset() {
+  evaluate(`:ubu "centaur/bridge/top"`).catch(r => {
+    unhandledErrorCallback(r);
+  });
+}
+
+ws = new WebSocket(`ws:35.227.97.92/acl2`);
+// ws.addEventListener('error', onUpdate);
+ws.addEventListener("message", onUpdate);
+ws.addEventListener("close", onUpdate);
+queue = [];
+
+function defaultCallback(e: {}) {
+  console.warn("No handler for", e);
+}
 function onUpdate(e: Event) {
-  let resolver: (v: string) => void;
+  let resolver: (v: Acl2Response) => void;
   let rejecter: (e: string) => void;
   if (queue.length === 0) {
     rejecter = unhandledErrorCallback;
@@ -36,37 +52,36 @@ function onUpdate(e: Event) {
     [resolver, rejecter] = queue.shift()!;
   }
   switch (e.type) {
-    case 'message':
-      resolver((e as MessageEvent).data);
+    case "message":
+      resolver(JSON.parse((e as MessageEvent).data));
       break;
-    case 'close':
+    case "close":
       const closeEvent = e as CloseEvent;
       if (!closeEvent.wasClean) {
         rejecter(`Socket closed unexpectedly. Error code ${closeEvent.code}.`);
       } else {
-        resolver('Socket closed.');
+        resolver({ Kind: "ERROR", Body: "Socket closed." });
       }
       break;
     default:
       throw new Error(`Unexpected event type: ${e.type}`);
   }
 }
-// ws.addEventListener('error', onUpdate);
-ws.addEventListener('message', onUpdate);
-ws.addEventListener('close', onUpdate);
 
-export function evaluate(code: string): Promise<string> {
+export function evaluate(code: string): Promise<Acl2Response> {
   if (ws.readyState !== WebSocket.OPEN) {
-    return Promise.reject('Socket is not open');
+    return Promise.reject("Socket is not open");
   }
   ws.send(code);
   return new Promise((resolver, rejecter) => queue.push([resolver, rejecter]));
 }
 
-export async function evaluateInProgramMode(code: string): Promise<string> {
-  await evaluate(':program');  // Ignore
+export async function evaluateInProgramMode(
+  code: string
+): Promise<Acl2Response> {
+  await evaluate(":program"); // Ignore
   const response = await evaluate(code);
-  await evaluate(':logic');  // Ignore
+  await evaluate(":logic"); // Ignore
   return response;
 }
 

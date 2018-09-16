@@ -1,6 +1,7 @@
 FROM golang:latest
 ADD . /go/src/acl2
 RUN go get github.com/gorilla/websocket
+RUN go get cloud.google.com/go/logging
 RUN CGO_ENABLED=0 go install acl2
 
 #FROM alpine:latest
