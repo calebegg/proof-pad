@@ -70,15 +70,21 @@ export class Editor extends React.Component<{
             zIndex: -1;
           }}/>
           <button for="file" onClick={() => {
+            /*
+            This button activates the file input element hidden behind the
+            load button on the toolbar.
+            */
             this.fileInput.click();
-            const input = document.querySelector('input[type="file"]')
+            var input = document.querySelector('input[type="file"]')
             input.addEventListener('change', function (e) {
-              const reader = new FileReader();
-              reader.onload = () => {
-                changeValue(reader.result);
+              if (input != ""){
+                const reader = new FileReader();
+                reader.readAsText(input.files[0]);
+                reader.onload = () => {
+                  changeValue(reader.result);
+                  input = "";
+                }
               }
-              reader.readAsText(input.files[0]);
-
             }, false)
 
             var changeValue = (s) => {
