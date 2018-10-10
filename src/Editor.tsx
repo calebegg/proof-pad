@@ -26,6 +26,8 @@ import { reset } from "./acl2";
 import { State } from "./reducer";
 import {} from "@types/codemirror/codemirror-matchbrackets";
 
+
+
 export class Editor extends React.Component<{
   value: string;
   onChange(value: string): void;
@@ -59,19 +61,38 @@ export class Editor extends React.Component<{
               <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" />
             </svg>
           </button>
-          <button aria-label="Load" onCLick={() => {
-            if (this.editor)
-            {
-              console.log(this.props.value); // doesn't work for some reason
+          <input ref={fileInput => this.fileInput = fileInput}
+                 type="file" name="file" id="file" style={{
+            width: 0.1;
+            height: 0.1;
+            opacity: 0;
+            position: 'absolute';
+            zIndex: -1;
+          }}/>
+          <button for="file" onClick={() => {
+            this.fileInput.click();
+            const input = document.querySelector('input[type="file"]')
+            input.addEventListener('change', function (e) {
+              const reader = new FileReader();
+              reader.onload = () => {
+                changeValue(reader.result);
+              }
+              reader.readAsText(input.files[0]);
+
+            }, false)
+
+            var changeValue = (s) => {
+              this.props.onChange(s);
             }
+
           }}>
-            <svg
-              fill="currentColor"
-              height="24"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
+              <svg
+                fill="currentColor"
+                height="24"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
               <path d="M0 0h24v24H0z" fill="none" />
               <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
             </svg>
