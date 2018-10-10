@@ -37,7 +37,12 @@ export class Editor extends React.Component<{
     return (
       <div id="editor" hidden={this.props.hidden}>
         <div id="editor-toolbar">
-          <button aria-label="Save">
+          <button aria-label="Save" onClick={() => {
+            if (this.editor)
+            {
+              console.log(this.props.value);
+            }
+          }}>
             <svg
               fill="currentColor"
               viewBox="0 0 24 24"
