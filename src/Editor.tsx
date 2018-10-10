@@ -26,8 +26,6 @@ import { reset } from "./acl2";
 import { State } from "./reducer";
 import {} from "@types/codemirror/codemirror-matchbrackets";
 
-
-
 export class Editor extends React.Component<{
   value: string;
   onChange(value: string): void;
