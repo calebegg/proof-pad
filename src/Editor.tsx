@@ -37,17 +37,16 @@ export class Editor extends React.Component<{
     return (
       <div id="editor" hidden={this.props.hidden}>
         <div id="editor-toolbar">
-          <button aria-label="Save" onClick={() => {
-            if (this.editor)
-            {
-              // save code in .lisp file.
-              var element = document.createElement("a");
-              var file = new Blob([this.props.value]);
+          <button
+            aria-label="Save"
+            onClick={() => {
+              const element = document.createElement("a");
+              const file = new Blob([this.props.value]);
               element.href = URL.createObjectURL(file);
               element.download = "code.lisp";
               element.click();
-            }
-          }}>
+            }}
+          >
             <svg
               fill="currentColor"
               viewBox="0 0 24 24"
@@ -59,44 +58,44 @@ export class Editor extends React.Component<{
               <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" />
             </svg>
           </button>
-          <input ref={fileInput => this.fileInput = fileInput}
-                 type="file" name="file" id="file" style={{
-            width: 0.1;
-            height: 0.1;
-            opacity: 0;
-            position: 'absolute';
-            zIndex: -1;
-          }}/>
-          <button for="file" onClick={() => {
-            /*
-            This button activates the file input element hidden behind the
-            load button on the toolbar.
-            */
-            this.fileInput.click();
-            var input = document.querySelector('input[type="file"]')
-            input.addEventListener('change', function (e) {
-              if (input != ""){
+          <input
+            type="file"
+            id="fileInput"
+            accept=".lisp"
+            style={{ display: "none" }}
+            onchange="handleFiles(this.files)"
+          />
+          <button
+            onClick={() => {
+              const input = document.getElementById("fileInput");
+              input.click(); // Activates the hidden file input.
+              const inputFile = document.querySelector('input[type="file"]');
+              const changeHandler = () => {
                 const reader = new FileReader();
-                reader.readAsText(input.files[0]);
-                reader.onload = () => {
-                  changeValue(reader.result);
-                  input = "";
-                }
-              }
-            }, false)
-
-            var changeValue = (s) => {
-              this.props.onChange(s);
-            }
-
-          }}>
-              <svg
-                fill="currentColor"
-                height="24"
-                viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+                reader.readAsText(inputFile.files[0]);
+                reader.addEventListener(
+                  "load",
+                  () => {
+                    this.props.onChange(reader.result);
+                    inputFile.removeEventListener(
+                      "change",
+                      changeHandler,
+                      false
+                    );
+                  },
+                  false
+                );
+              };
+              inputFile.addEventListener("change", changeHandler, false);
+            }}
+          >
+            <svg
+              fill="currentColor"
+              height="24"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path d="M0 0h24v24H0z" fill="none" />
               <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
             </svg>
