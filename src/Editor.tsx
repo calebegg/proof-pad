@@ -63,7 +63,6 @@ export class Editor extends React.Component<{
             id="fileInput"
             accept=".lisp"
             style={{ display: "none" }}
-            onchange="handleFiles(this.files)"
           />
           <button
             onClick={() => {
@@ -77,16 +76,14 @@ export class Editor extends React.Component<{
                   "load",
                   () => {
                     this.props.onChange(reader.result);
-                    inputFile.removeEventListener(
-                      "change",
-                      changeHandler,
-                      false
-                    );
+                    inputFile.removeEventListener("change", changeHandler);
                   },
                   false
                 );
+                // Ensures change event triggered if same file uploaded twice.
+                inputFile.value = null;
               };
-              inputFile.addEventListener("change", changeHandler, false);
+              inputFile.addEventListener("change", changeHandler);
             }}
           >
             <svg
