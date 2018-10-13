@@ -31,6 +31,7 @@ export class Editor extends React.Component<{
   onChange(value: string): void;
   hidden?: boolean;
 }> {
+  private fileInput!: HTMLInputElement;
   private editor: CodeMirror.Editor | null = null;
 
   render() {
@@ -59,26 +60,27 @@ export class Editor extends React.Component<{
             </svg>
           </button>
           <input
-            ref={fileInput => (this.fileInput = fileInput)}
+            ref={fileInput => {
+              this.fileInput = fileInput!;
+            }}
             type="file"
-            id="fileInput"
             accept=".lisp"
             style={{ display: "none" }}
           />
           <button
             onClick={() => {
-              fileInput.click(); // Activates the hidden file input.
+              this.fileInput.click(); // Activates the hidden file input.
               const changeHandler = () => {
                 const reader = new FileReader();
-                reader.readAsText(fileInput.files[0]);
+                reader.readAsText(this.fileInput.files![0]);
                 reader.addEventListener("load", () => {
-                  this.props.onChange(reader.result);
-                  fileInput.removeEventListener("change", changeHandler);
+                  this.props.onChange(reader.result as string);
+                  this.fileInput.removeEventListener("change", changeHandler);
                 });
                 // Ensures change event triggered if same file uploaded twice.
-                fileInput.value = null;
+                this.fileInput.value = "";
               };
-              fileInput.addEventListener("change", changeHandler);
+              this.fileInput.addEventListener("change", changeHandler);
             }}
           >
             <svg
