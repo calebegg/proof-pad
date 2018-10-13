@@ -31,13 +31,23 @@ export class Editor extends React.Component<{
   onChange(value: string): void;
   hidden?: boolean;
 }> {
+  private fileInput!: HTMLInputElement;
   private editor: CodeMirror.Editor | null = null;
 
   render() {
     return (
       <div id="editor" hidden={this.props.hidden}>
         <div id="editor-toolbar">
-          <button aria-label="Save">
+          <button
+            aria-label="Save"
+            onClick={() => {
+              const element = document.createElement("a");
+              const file = new Blob([this.props.value]);
+              element.href = URL.createObjectURL(file);
+              element.download = "code.lisp";
+              element.click();
+            }}
+          >
             <svg
               fill="currentColor"
               viewBox="0 0 24 24"
@@ -49,7 +59,30 @@ export class Editor extends React.Component<{
               <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" />
             </svg>
           </button>
-          <button aria-label="Load">
+          <input
+            ref={fileInput => {
+              this.fileInput = fileInput!;
+            }}
+            type="file"
+            accept=".lisp"
+            style={{ display: "none" }}
+          />
+          <button
+            onClick={() => {
+              this.fileInput.click(); // Activates the hidden file input.
+              const changeHandler = () => {
+                const reader = new FileReader();
+                reader.readAsText(this.fileInput.files![0]);
+                reader.addEventListener("load", () => {
+                  this.props.onChange(reader.result as string);
+                  this.fileInput.removeEventListener("change", changeHandler);
+                });
+                // Ensures change event triggered if same file uploaded twice.
+                this.fileInput.value = "";
+              };
+              this.fileInput.addEventListener("change", changeHandler);
+            }}
+          >
             <svg
               fill="currentColor"
               height="24"
