@@ -36,6 +36,7 @@ function ToolbarImpl(props: {
               recordOutput(await evaluateInProgramMode(props.editorValue))
             );
           }}
+          aria-label="Run"
         >
           <svg
             fill="currentColor"
@@ -56,6 +57,7 @@ function ToolbarImpl(props: {
             await reset();
             props.dispatch(recordOutput(await evaluate(props.editorValue)));
           }}
+          aria-label="Check"
         >
           <svg
             fill="currentColor"

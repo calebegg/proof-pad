@@ -135,7 +135,7 @@ pre,
 textarea,
 .CodeMirror {
   font-size: 13px;
-  font-family: monaco;
+  font-family: Monaco, monospace;
 }
 
 pre {
@@ -303,4 +303,32 @@ button.show-more {
   color: #999;
   text-transform: uppercase;
   box-shadow: 0 -4px 8px rgba(181, 181, 181, 0.21);
+}
+
+button[aria-label] {
+  position: relative;
+}
+
+button[aria-label]::before {
+  content: attr(aria-label);
+
+  display: none;
+
+  position: absolute;
+  bottom: 50%;
+  right: 130%;
+
+  margin-bottom: -14px;
+  padding: 7px;
+
+  border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+button[aria-label]:hover::before {
+  display: block;
 }

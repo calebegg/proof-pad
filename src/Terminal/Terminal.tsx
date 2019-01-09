@@ -83,7 +83,7 @@ class TerminalImpl extends React.Component<
         id="terminal"
         onClick={async () => {
           await new Promise(resolve => setTimeout(resolve, 0));
-          if (document.getSelection().isCollapsed) {
+          if (document.getSelection()!.isCollapsed) {
             if (this.state.running) {
               this.focusTrap.focus();
             } else {

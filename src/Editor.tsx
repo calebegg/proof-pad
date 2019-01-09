@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+/// <reference path="../node_modules/@types/codemirror/codemirror-matchbrackets.d.ts" />
+
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "codemirror/addon/edit/matchbrackets";
@@ -24,7 +26,6 @@ import { Dispatch, connect } from "react-redux";
 import { evaluate } from "./acl2";
 import { reset } from "./acl2";
 import { State } from "./reducer";
-import {} from "@types/codemirror/codemirror-matchbrackets";
 
 export class Editor extends React.Component<{
   value: string;

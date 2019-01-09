@@ -24,7 +24,7 @@ const tutorial = require("./tutorial.md");
 
 const sections: HTMLElement[] = [];
 
-let elem = new DOMParser().parseFromString(tutorial, "text/html").body
+let elem: Node = new DOMParser().parseFromString(tutorial, "text/html").body
   .firstChild!;
 
 let heading;
