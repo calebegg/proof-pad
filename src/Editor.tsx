@@ -26,7 +26,6 @@ import { ProofBar } from "./ProofBar";
 
 /** A top-level s-expression from the editor */
 export interface Form {
-  verified: boolean;
   /** Pixel height of this form as it is in the editor. */
   height: number;
   source: string;
@@ -41,11 +40,12 @@ export class Editor extends React.Component<
     hidden?: boolean;
     onOutput: (response: Acl2Response) => void;
   },
-  { forms: Form[] }
+  { forms: Form[]; verifiedLines: number }
 > {
   private fileInput!: HTMLInputElement;
   private editor: IInstance | null = null;
-  state = { forms: [] as Form[] };
+  state = { forms: [] as Form[], verifiedLines: 0 };
+  readOnlyMarker?: CodeMirror.TextMarker;
 
   render() {
     return (
@@ -149,29 +149,62 @@ export class Editor extends React.Component<
             flex: 1,
             overflowY: "scroll",
             overflowX: "hidden",
+            position: "relative",
           }}
         >
           <ProofBar
             forms={this.state.forms}
-            onClick={async index => {
-              console.log(index);
-              await reset();
+            verifiedHeight={
+              this.editor
+                ? this.state.verifiedLines * this.editor!.defaultTextHeight()
+                : 0
+            }
+            advanceTo={async index => {
               const forms = [...this.state.forms];
+              let verifiedLines = this.state.verifiedLines;
               for (let i = 0; i <= index; i++) {
-                const form = forms[i];
+                const form = forms.shift()!;
                 const response = await evaluate(form.source);
                 this.props.onOutput(response);
 
                 if (response.Kind !== "SUCCESS") {
+                  forms.unshift(form);
                   break;
                 }
 
-                this.editor!.markText(this.editor!.posFromIndex(0), form.end, {
-                  readOnly: true,
-                });
-                form.verified = true;
+                verifiedLines = form.end.line + 1;
+                if (this.readOnlyMarker) this.readOnlyMarker.clear();
+                this.readOnlyMarker = this.editor!.markText(
+                  this.editor!.posFromIndex(0),
+                  form.end,
+                  {
+                    readOnly: true,
+                  },
+                );
               }
-              this.setState({ ...this.state, forms });
+              this.setState({ ...this.state, forms, verifiedLines });
+            }}
+            reset={async () => {
+              await reset();
+              if (this.readOnlyMarker) this.readOnlyMarker.clear();
+              this.setState({
+                ...this.state,
+                verifiedLines: 0,
+              });
+              this.computeForms();
+            }}
+          />
+          <div
+            className="read-only-background"
+            style={{
+              background: "#ddd",
+              position: "absolute",
+              left: 40,
+              right: 0,
+              top: 0,
+              height:
+                this.state.verifiedLines *
+                (this.editor ? this.editor.defaultTextHeight() : 0),
             }}
           />
           <Controlled
@@ -202,16 +235,9 @@ export class Editor extends React.Component<
   computeForms() {
     if (!this.editor) return;
     let nestLevel = 0;
-    let startingLine = 0;
     let forms: Form[] = [];
-    for (let i = this.state.forms.length - 1; i >= 0; i--) {
-      if (this.state.forms[i].verified) {
-        startingLine = this.state.forms[i].end.line + 1;
-        forms = this.state.forms.slice(0, i + 1);
-        break;
-      }
-    }
     let source = "";
+    let startingLine = this.state.verifiedLines;
     for (let i = startingLine; i < this.editor.lastLine() + 1; i++) {
       for (const token of this.editor.getLineTokens(i)) {
         source += token.string;
@@ -223,7 +249,6 @@ export class Editor extends React.Component<
         }
         if (nestLevel == 0) {
           forms.push({
-            verified: false,
             height: (i - startingLine + 1) * this.editor.defaultTextHeight(),
             source,
             end: { line: i, ch: token.end },

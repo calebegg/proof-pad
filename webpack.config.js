@@ -21,6 +21,7 @@ const webpack = require("webpack");
 module.exports = {
   entry: "./src/index.tsx",
   output: { filename: "bundle.js", path: __dirname + "/dist" },
+  mode: "production",
 
   // Enable sourcemaps for debugging webpack's output.
   devtool: "source-map",

@@ -95,6 +95,7 @@ button {
   align-items: stretch;
   height: 100%;
   overflow: hidden;
+  position: relative;
 }
 
 #editor > textarea {
@@ -113,7 +114,6 @@ button {
 }
 
 #proofbar > .form {
-  border-bottom: solid black 1px;
   box-sizing: border-box;
   cursor: pointer;
   text-align: center;
@@ -286,6 +286,7 @@ div.CodeMirror {
   overflow: visible;
   height: auto;
   min-height: calc(100% - 48px);
+  background: transparent;
 }
 
 div.CodeMirror span.CodeMirror-matchingbracket {
