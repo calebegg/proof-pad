@@ -17,23 +17,35 @@
 
 /// <reference path="../node_modules/@types/codemirror/codemirror-matchbrackets.d.ts" />
 
-import * as React from "react";
-import * as ReactDOM from "react-dom";
 import "codemirror/addon/edit/matchbrackets";
 import "codemirror/mode/commonlisp/commonlisp";
-import { Controlled } from "react-codemirror2";
-import { Dispatch, connect } from "react-redux";
-import { evaluate } from "./acl2";
-import { reset } from "./acl2";
-import { State } from "./reducer";
+import React from "react";
+import { Controlled, IInstance } from "react-codemirror2";
+import { Acl2Response, evaluate, reset } from "./acl2";
+import { ProofBar } from "./ProofBar";
 
-export class Editor extends React.Component<{
-  value: string;
-  onChange(value: string): void;
-  hidden?: boolean;
-}> {
+/** A top-level s-expression from the editor */
+export interface Form {
+  verified: boolean;
+  /** Pixel height of this form as it is in the editor. */
+  height: number;
+  source: string;
+  /** Position of the end character of the form in the editor */
+  end: CodeMirror.Position;
+}
+
+export class Editor extends React.Component<
+  {
+    value: string;
+    onChange(value: string): void;
+    hidden?: boolean;
+    onOutput: (response: Acl2Response) => void;
+  },
+  { forms: Form[] }
+> {
   private fileInput!: HTMLInputElement;
-  private editor: CodeMirror.Editor | null = null;
+  private editor: IInstance | null = null;
+  state = { forms: [] as Form[] };
 
   render() {
     return (
@@ -130,17 +142,97 @@ export class Editor extends React.Component<{
             </svg>
           </button>
         </div>
-        <Controlled
-          options={{ mode: "commonlisp", matchBrackets: true }}
-          onBeforeChange={(editor, data, value) => {
-            this.props.onChange(value);
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            flex: 1,
+            overflowY: "scroll",
+            overflowX: "hidden",
           }}
-          editorDidMount={e => {
-            this.editor = e;
-          }}
-          value={this.props.value}
-        />
+        >
+          <ProofBar
+            forms={this.state.forms}
+            onClick={async index => {
+              console.log(index);
+              await reset();
+              const forms = [...this.state.forms];
+              for (let i = 0; i <= index; i++) {
+                const form = forms[i];
+                const response = await evaluate(form.source);
+                this.props.onOutput(response);
+
+                if (response.Kind !== "SUCCESS") {
+                  break;
+                }
+
+                this.editor!.markText(this.editor!.posFromIndex(0), form.end, {
+                  readOnly: true,
+                });
+                form.verified = true;
+              }
+              this.setState({ ...this.state, forms });
+            }}
+          />
+          <Controlled
+            options={{
+              mode: "commonlisp",
+              matchBrackets: true,
+              closeBrackets: true,
+            }}
+            onBeforeChange={(editor, data, value) => {
+              this.props.onChange(value);
+            }}
+            onChange={(editor, data, value) => {
+              this.computeForms();
+            }}
+            editorDidMount={e => {
+              this.editor = e;
+              this.computeForms();
+            }}
+            value={this.props.value}
+          >
+            a
+          </Controlled>
+        </div>
       </div>
     );
+  }
+
+  computeForms() {
+    if (!this.editor) return;
+    let nestLevel = 0;
+    let startingLine = 0;
+    let forms: Form[] = [];
+    for (let i = this.state.forms.length - 1; i >= 0; i--) {
+      if (this.state.forms[i].verified) {
+        startingLine = this.state.forms[i].end.line + 1;
+        forms = this.state.forms.slice(0, i + 1);
+        break;
+      }
+    }
+    let source = "";
+    for (let i = startingLine; i < this.editor.lastLine() + 1; i++) {
+      for (const token of this.editor.getLineTokens(i)) {
+        source += token.string;
+        if (!token.type) continue;
+        if (token.string === "(") {
+          nestLevel++;
+        } else if (token.string === ")") {
+          nestLevel--;
+        }
+        if (nestLevel == 0) {
+          forms.push({
+            verified: false,
+            height: (i - startingLine + 1) * this.editor.defaultTextHeight(),
+            source,
+            end: { line: i, ch: token.end },
+          });
+          startingLine = i + 1;
+          source = "";
+        }
+      }
+    }
+    this.setState({ ...this.state, forms });
   }
 }

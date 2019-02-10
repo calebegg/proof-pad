@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import * as React from "react";
+import React from "react";
 import { State } from "../reducer";
 
 export class InputField extends React.Component<
@@ -62,6 +62,7 @@ export class InputField extends React.Component<
       >
         <span className="display">{">"}&nbsp;&nbsp;</span>
         <input
+          spellCheck={false}
           ref={i => {
             this.props.onInputRef(i!);
           }}

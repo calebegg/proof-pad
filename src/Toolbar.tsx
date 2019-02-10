@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import { Dispatch } from "redux";
-import { State, recordOutput } from "./reducer";
-import { evaluateInProgramMode, evaluate, reset } from "./acl2";
+import React from "react";
 import { connect } from "react-redux";
+import { Dispatch } from "redux";
+import { evaluate, evaluateInProgramMode, reset } from "./acl2";
+import { recordOutput, State } from "./reducer";
 
 function ToolbarImpl(props: {
   dispatch: Dispatch<State>;

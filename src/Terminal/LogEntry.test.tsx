@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-import * as React from "react";
-import { LogEntry } from "./LogEntry";
+import React from "react";
 import { create } from "react-test-renderer";
 import { LogKind } from "../reducer";
+import { LogEntry } from "./LogEntry";
 
 test("Renders inputs", () => {
   const c = create(<LogEntry kind={LogKind.INPUT} value="hi" />);

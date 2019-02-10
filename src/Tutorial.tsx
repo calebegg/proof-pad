@@ -15,10 +15,7 @@
  * limitations under the License.
  */
 
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import { State } from "./reducer";
-import { Dispatch, connect } from "react-redux";
+import React from "react";
 
 const tutorial = require("./tutorial.md");
 

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-import * as React from "react";
-import { LogKind, showTutorial } from "../reducer";
+import React from "react";
 import { connect } from "react-redux";
+import { LogKind, showTutorial } from "../reducer";
 
 const WELCOME_MESSAGE = require("./welcome.md");
 
@@ -95,8 +95,11 @@ class LogEntryImpl extends React.Component<
   }
 }
 
-export const LogEntry = connect(null, dispatch => ({
-  showTutorial: () => {
-    dispatch(showTutorial());
-  },
-}))(LogEntryImpl);
+export const LogEntry = connect(
+  null,
+  dispatch => ({
+    showTutorial: () => {
+      dispatch(showTutorial());
+    },
+  })
+)(LogEntryImpl);

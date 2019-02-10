@@ -15,18 +15,15 @@
  * limitations under the License.
  */
 
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import { Editor } from "./Editor";
-import { Terminal } from "./Terminal/Terminal";
-import { evaluate, evaluateInProgramMode } from "./acl2";
-import { Provider, connect } from "react-redux";
+import React from "react";
+import ReactDOM from "react-dom";
+import { connect, Provider } from "react-redux";
 import { createStore, Dispatch } from "redux";
-import { proofPad, recordOutput, doIt, State, updateEditor } from "./reducer";
-import { Tutorial } from "./Tutorial";
+import { Editor } from "./Editor";
+import { doIt, proofPad, recordOutput, State, updateEditor } from "./reducer";
+import { Terminal } from "./Terminal/Terminal";
 import { Toolbar } from "./Toolbar";
-
-let error: string | undefined;
+import { Tutorial } from "./Tutorial";
 
 const store = createStore(proofPad);
 
@@ -50,7 +47,7 @@ class MainImpl extends React.Component<
             <></>
           )}
           {this.state.editorHidden ? (
-            ""
+            <></>
           ) : (
             <Editor
               onChange={v => {
@@ -58,6 +55,9 @@ class MainImpl extends React.Component<
               }}
               value={this.props.editorValue}
               hidden={this.state.editorHidden}
+              onOutput={r => {
+                this.props.dispatch(recordOutput(r));
+              }}
             />
           )}
         </div>

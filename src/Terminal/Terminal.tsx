@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import { evaluate, listenForUnhandledError } from "../acl2";
+import React from "react";
 import { connect } from "react-redux";
-import { State, recordInput, recordOutput, LogKind } from "../reducer";
 import { Dispatch } from "redux";
+import { evaluate, listenForUnhandledError } from "../acl2";
+import { LogKind, recordInput, recordOutput, State } from "../reducer";
 import { InputField } from "./InputField";
 import { LogEntry } from "./LogEntry";
 

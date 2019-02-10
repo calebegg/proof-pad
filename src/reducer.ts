@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-import { Action } from "redux";
 import { Acl2Response } from "./acl2";
 
 export enum LogKind {
@@ -39,7 +38,13 @@ export interface State {
 
 const INITIAL_STATE: State = {
   log: [{ output: { kind: LogKind.WELCOME } }],
-  editorValue: "",
+  editorValue: `(defun fac (n)
+  (if (zp n)
+      1
+      (* n (fac (1- n)))))
+
+(thm (= (fac 3) 6))
+`,
   tutorialShowing: false,
 };
 

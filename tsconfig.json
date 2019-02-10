@@ -6,7 +6,9 @@
     "target": "es6",
     "module": "commonjs",
     "strict": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
   },
   "include": ["./src/**/*"]
 }

@@ -93,6 +93,8 @@ button {
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
+  height: 100%;
+  overflow: hidden;
 }
 
 #editor > textarea {
@@ -104,6 +106,17 @@ button {
 
 #editor > textarea:focus {
   background: white;
+}
+
+#proofbar {
+  width: 40px;
+}
+
+#proofbar > .form {
+  border-bottom: solid black 1px;
+  box-sizing: border-box;
+  cursor: pointer;
+  text-align: center;
 }
 
 input {
@@ -266,12 +279,13 @@ form,
 }
 
 .react-codemirror2 {
-  height: calc(100% - 48px);
   flex: 1;
 }
 
 div.CodeMirror {
-  height: 100%;
+  overflow: visible;
+  height: auto;
+  min-height: calc(100% - 48px);
 }
 
 div.CodeMirror span.CodeMirror-matchingbracket {
@@ -284,6 +298,12 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
   border: solid red 1px;
   margin: -1px;
   color: #997;
+}
+
+.CodeMirror-scroll {
+  height: auto;
+  overflow-y: hidden;
+  overflow-x: auto;
 }
 
 button.show-more {
