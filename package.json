@@ -44,9 +44,10 @@
     },
     "testMatch": [
       "**/*.test.(ts|tsx|js)"
-    ]
+    ],
+    "testURL": "http://localhost"
   },
   "prettier": {
-    "trailingComma": "es5"
+    "trailingComma": "all"
   }
 }
