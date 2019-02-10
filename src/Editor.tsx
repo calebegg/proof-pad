@@ -160,6 +160,7 @@ export class Editor extends React.Component<
                 : 0
             }
             advanceTo={async index => {
+              if (!this.editor) return;
               const forms = [...this.state.forms];
               let verifiedLines = this.state.verifiedLines;
               for (let i = 0; i <= index; i++) {
@@ -174,8 +175,8 @@ export class Editor extends React.Component<
 
                 verifiedLines = form.end.line + 1;
                 if (this.readOnlyMarker) this.readOnlyMarker.clear();
-                this.readOnlyMarker = this.editor!.markText(
-                  this.editor!.posFromIndex(0),
+                this.readOnlyMarker = this.editor.markText(
+                  this.editor.posFromIndex(0),
                   form.end,
                   {
                     readOnly: true,
@@ -240,6 +241,7 @@ export class Editor extends React.Component<
     let startingLine = this.state.verifiedLines;
     for (let i = startingLine; i < this.editor.lastLine() + 1; i++) {
       for (const token of this.editor.getLineTokens(i)) {
+        if (token.type === "comment") continue;
         source += token.string;
         if (!token.type) continue;
         if (token.string === "(") {

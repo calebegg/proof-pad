@@ -38,13 +38,7 @@ export interface State {
 
 const INITIAL_STATE: State = {
   log: [{ output: { kind: LogKind.WELCOME } }],
-  editorValue: `(defun fac (n)
-  (if (zp n)
-      1
-      (* n (fac (1- n)))))
-
-(thm (= (fac 3) 6))
-`,
+  editorValue: localStorage.getItem("autosave") || "",
   tutorialShowing: false,
 };
 
@@ -110,6 +104,7 @@ export function proofPad(state = INITIAL_STATE, action: ProofPadAction): State {
     case "ONE_OFF":
       return action.act(state);
     case "UPDATE_EDITOR":
+      localStorage.setItem("autosave", action.value);
       return {
         ...state,
         editorValue: action.value,
