@@ -23,7 +23,6 @@ import { Editor } from "./Editor";
 import { doIt, proofPad, recordOutput, State, updateEditor } from "./reducer";
 import { Terminal } from "./Terminal/Terminal";
 import { Toolbar } from "./Toolbar";
-import { Tutorial } from "./Tutorial";
 
 const store = createStore(proofPad);
 
@@ -37,15 +36,6 @@ class MainImpl extends React.Component<
     return (
       <>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          {this.props.tutorialShowing ? (
-            <Tutorial
-              onReadyForDefs={() => {
-                this.setState({ editorHidden: false });
-              }}
-            />
-          ) : (
-            <></>
-          )}
           {this.state.editorHidden ? (
             <></>
           ) : (
@@ -86,5 +76,5 @@ ReactDOM.render(
   <Provider store={store}>
     <Main />
   </Provider>,
-  document.getElementById("container")
+  document.getElementById("container"),
 );

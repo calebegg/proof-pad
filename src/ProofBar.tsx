@@ -31,6 +31,7 @@ export function ProofBar(props: ProofBarProps) {
       )}
       {props.forms.map((f, i) => (
         <div
+          key={i}
           className="form"
           style={{
             height: f.height,

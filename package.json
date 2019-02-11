@@ -12,6 +12,7 @@
     "html-loader": "^0.5.5",
     "jest": "^22.2.2",
     "markdown-loader": "^2.0.2",
+    "parcel": "^1.11.0",
     "react-test-renderer": "^16.8.1",
     "source-map-loader": "^0.2.3",
     "typescript": "^3.3.3",
@@ -49,5 +50,8 @@
   },
   "prettier": {
     "trailingComma": "all"
-  }
+  },
+  "browserslist": [
+    "since 2017-06"
+  ]
 }

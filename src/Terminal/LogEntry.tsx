@@ -19,8 +19,6 @@ import React from "react";
 import { connect } from "react-redux";
 import { LogKind, showTutorial } from "../reducer";
 
-const WELCOME_MESSAGE = require("./welcome.md");
-
 const KIND_TO_SYMBOL = new Map([[LogKind.ERROR, "×"], [LogKind.INPUT, ">"]]);
 
 class LogEntryImpl extends React.Component<
@@ -43,19 +41,17 @@ class LogEntryImpl extends React.Component<
   render() {
     if (this.props.kind === LogKind.WELCOME) {
       return (
-        <div
-          dangerouslySetInnerHTML={{ __html: WELCOME_MESSAGE }}
-          ref={d => {
-            if (!d) return;
-            d.querySelector('a[href="#tutorial"]')!.addEventListener(
-              "click",
-              e => {
-                e.preventDefault();
-                this.props.showTutorial();
-              }
-            );
-          }}
-        />
+        <div>
+          <h1>Welcome to Proof Pad</h1>
+          <p>
+            Proof Pad is a web-based IDE for{" "}
+            <a href="https://www.cs.utexas.edu/users/moore/acl2/">ACL2</a>.
+          </p>
+          <p>
+            Learn more about the project or file issues{" "}
+            <a href="https://github.com/calebegg/proof-pad">on Github</a>.
+          </p>
+        </div>
       );
     }
     return (
@@ -101,5 +97,5 @@ export const LogEntry = connect(
     showTutorial: () => {
       dispatch(showTutorial());
     },
-  })
+  }),
 )(LogEntryImpl);
