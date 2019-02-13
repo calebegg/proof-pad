@@ -129,6 +129,11 @@ input {
   left: -1px;
 }
 
+#input input,
+#input .display {
+  padding: 8px 0;
+}
+
 input:focus {
   background: white;
 }
@@ -146,9 +151,11 @@ form,
 input,
 pre,
 textarea,
+code,
 .CodeMirror {
-  font-size: 13px;
+  font-size: 12px;
   font-family: Monaco, monospace;
+  line-height: 1.2;
 }
 
 pre {
@@ -318,7 +325,7 @@ button.show-more {
   );
   border-top: 1px #ddd solid;
   box-shadow: none;
-  padding: 8px;
+  padding: 4px 8px;
   bottom: 0;
   left: -24px;
   color: #999;

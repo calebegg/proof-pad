@@ -31,7 +31,7 @@ class LogEntryImpl extends React.Component<
   componentDidMount() {
     if (
       this.elem &&
-      this.elem.clientHeight > 150 &&
+      this.elem.clientHeight > 250 &&
       this.props.kind !== LogKind.INPUT
     ) {
       this.setState({ expanded: false });
@@ -64,12 +64,12 @@ class LogEntryImpl extends React.Component<
         <div
           style={{
             overflow: "hidden",
-            maxHeight: this.state.expanded ? "" : 100,
+            maxHeight: this.state.expanded ? "" : 75,
           }}
         >
-          <span className="display">
+          <code className="display">
             {KIND_TO_SYMBOL.get(this.props.kind) || "<"}&nbsp;&nbsp;
-          </span>
+          </code>
           {this.props.kind === LogKind.PENDING ? "..." : this.props.value}
         </div>
         <div>

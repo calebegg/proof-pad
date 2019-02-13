@@ -60,7 +60,7 @@ export class InputField extends React.Component<
           this.historyIdx = 0;
         }}
       >
-        <span className="display">{">"}&nbsp;&nbsp;</span>
+        <code className="display">{">"}&nbsp;&nbsp;</code>
         <input
           spellCheck={false}
           ref={i => {

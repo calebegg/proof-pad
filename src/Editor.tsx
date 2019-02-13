@@ -239,7 +239,7 @@ export class Editor extends React.Component<
     let forms: Form[] = [];
     let source = "";
     let startingLine = this.state.verifiedLines;
-    for (let i = startingLine; i < this.editor.lastLine() + 1; i++) {
+    outer: for (let i = startingLine; i < this.editor.lastLine() + 1; i++) {
       for (const token of this.editor.getLineTokens(i)) {
         if (token.type === "comment") continue;
         source += token.string;
@@ -248,6 +248,10 @@ export class Editor extends React.Component<
           nestLevel++;
         } else if (token.string === ")") {
           nestLevel--;
+        }
+        if (nestLevel < 0) {
+          // Bail out because there are un-balanced parens and the rest of this code is going to go south.
+          break outer;
         }
         if (nestLevel == 0) {
           forms.push({
