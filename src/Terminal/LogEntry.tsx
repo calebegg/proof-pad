@@ -15,87 +15,66 @@
  * limitations under the License.
  */
 
-import React from "react";
-import { connect } from "react-redux";
-import { LogKind, showTutorial } from "../reducer";
+import React, { useState, useRef, useLayoutEffect, useCallback } from "react";
+import { LogKind } from "../reducer";
 
 const KIND_TO_SYMBOL = new Map([[LogKind.ERROR, "×"], [LogKind.INPUT, ">"]]);
 
-class LogEntryImpl extends React.Component<
-  { kind: LogKind; value?: string; showTutorial: () => void },
-  { expanded: boolean }
-> {
-  private elem: Element | null = null;
-  state = { expanded: true };
+export function LogEntry({kind, value}: { kind: LogKind; value?: string }) {
+  const [expanded, setExpanded] = useState(true);
 
-  componentDidMount() {
-    if (
-      this.elem &&
-      this.elem.clientHeight > 250 &&
-      this.props.kind !== LogKind.INPUT
-    ) {
-      this.setState({ expanded: false });
+  const measure = useCallback((pre: HTMLPreElement|null) => {
+    console.log(pre);
+    if (pre && pre.clientHeight > 200 && kind !== LogKind.INPUT) {
+      setExpanded(false);
     }
-  }
+  }, [kind]);
 
-  render() {
-    if (this.props.kind === LogKind.WELCOME) {
-      return (
-        <div>
-          <h1>Welcome to Proof Pad</h1>
-          <p>
-            Proof Pad is a web-based IDE for{" "}
-            <a href="https://www.cs.utexas.edu/users/moore/acl2/">ACL2</a>.
-          </p>
-          <p>
-            Learn more about the project or file issues{" "}
-            <a href="https://github.com/calebegg/proof-pad">on Github</a>.
-          </p>
-        </div>
-      );
-    }
+  if (kind === LogKind.WELCOME) {
     return (
-      <pre
-        ref={d => {
-          this.elem = d;
-        }}
-        className={this.props.kind == LogKind.ERROR ? "error" : ""}
-      >
-        <div
-          style={{
-            overflow: "hidden",
-            maxHeight: this.state.expanded ? "" : 75,
-          }}
-        >
-          <code className="display">
-            {KIND_TO_SYMBOL.get(this.props.kind) || "<"}&nbsp;&nbsp;
-          </code>
-          {this.props.kind === LogKind.PENDING ? "..." : this.props.value}
-        </div>
-        <div>
-          {this.state.expanded ? (
-            ""
-          ) : (
-            <button
-              className="show-more"
-              onClick={() => {
-                this.setState({ expanded: true });
-              }}
-            >
-              Show more...
-            </button>
-          )}
-        </div>
-      </pre>
+      <div>
+        <h1>Welcome to Proof Pad</h1>
+        <p>
+          Proof Pad is a web-based IDE for{" "}
+          <a href="https://www.cs.utexas.edu/users/moore/acl2/">ACL2</a>.
+        </p>
+        <p>
+          Learn more about the project or file issues{" "}
+          <a href="https://github.com/calebegg/proof-pad">on Github</a>.
+        </p>
+      </div>
     );
   }
+  return (
+    <pre
+      ref={measure}
+      className={kind == LogKind.ERROR ? "error" : ""}
+    >
+      <div
+        style={{
+          overflow: "hidden",
+          maxHeight: expanded ? "" : 75,
+        }}
+      >
+        <code className="display">
+          {KIND_TO_SYMBOL.get(kind) || "<"}&nbsp;&nbsp;
+        </code>
+        {kind === LogKind.PENDING ? "..." : value}
+      </div>
+      <div>
+        {expanded ? (
+          ""
+        ) : (
+          <button
+            className="show-more"
+            onClick={() => {
+              setExpanded(true)
+            }}
+          >
+            Show more...
+          </button>
+        )}
+      </div>
+    </pre>
+  );
 }
-
-export const LogEntry = connect(
-  null,
-  dispatch => ({
-    showTutorial: () => {
-      dispatch(showTutorial());
-    },
-  }),
-)(LogEntryImpl);

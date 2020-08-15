@@ -29,7 +29,7 @@ interface TerminalStore {
 }
 
 interface TerminalDispatcher {
-  dispatch: Dispatch<State>;
+  dispatch: Dispatch;
 }
 
 type TerminalProps = TerminalStore & TerminalDispatcher;
