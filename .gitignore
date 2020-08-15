@@ -5,3 +5,5 @@ acl2_image_linux/*
 .DS_Store
 gin-bin
 .cache/*
+.firebase/*
+.parcel-cache/*
