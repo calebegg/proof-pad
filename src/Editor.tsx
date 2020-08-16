@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-/// <reference path="../node_modules/@types/codemirror/codemirror-matchbrackets.d.ts" />
-
 import "codemirror/addon/edit/matchbrackets";
 import "codemirror/mode/commonlisp/commonlisp";
 import React from "react";
-import { Controlled, IInstance } from "react-codemirror2";
+import { Controlled } from "react-codemirror2";
+import { Editor as CodeMirrorEditor, Position, TextMarker } from "codemirror";
 import { Acl2Response, evaluate, reset } from "./acl2";
 import { ProofBar } from "./ProofBar";
 
@@ -30,7 +29,7 @@ export interface Form {
   height: number;
   source: string;
   /** Position of the end character of the form in the editor */
-  end: CodeMirror.Position;
+  end: Position;
 }
 
 export class Editor extends React.Component<
@@ -43,9 +42,9 @@ export class Editor extends React.Component<
   { forms: Form[]; verifiedLines: number }
 > {
   private fileInput!: HTMLInputElement;
-  private editor: IInstance | null = null;
+  private editor: CodeMirrorEditor | null = null;
   state = { forms: [] as Form[], verifiedLines: 0 };
-  readOnlyMarker?: CodeMirror.TextMarker;
+  readOnlyMarker?: TextMarker;
 
   render() {
     return (
@@ -73,7 +72,7 @@ export class Editor extends React.Component<
             </svg>
           </button>
           <input
-            ref={fileInput => {
+            ref={(fileInput) => {
               this.fileInput = fileInput!;
             }}
             type="file"
@@ -159,7 +158,7 @@ export class Editor extends React.Component<
                 ? this.state.verifiedLines * this.editor!.defaultTextHeight()
                 : 0
             }
-            advanceTo={async index => {
+            advanceTo={async (index) => {
               if (!this.editor) return;
               const forms = [...this.state.forms];
               let verifiedLines = this.state.verifiedLines;
@@ -212,7 +211,6 @@ export class Editor extends React.Component<
             options={{
               mode: "commonlisp",
               matchBrackets: true,
-              closeBrackets: true,
             }}
             onBeforeChange={(editor, data, value) => {
               this.props.onChange(value);
@@ -220,7 +218,7 @@ export class Editor extends React.Component<
             onChange={(editor, data, value) => {
               this.computeForms();
             }}
-            editorDidMount={e => {
+            editorDidMount={(e) => {
               this.editor = e;
               this.computeForms();
             }}
