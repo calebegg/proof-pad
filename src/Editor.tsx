@@ -18,7 +18,7 @@
 import "codemirror/addon/edit/matchbrackets";
 import "codemirror/mode/commonlisp/commonlisp";
 import React from "react";
-import { Controlled } from "react-codemirror2";
+import { Controlled as CodeMirrorComponent } from "react-codemirror2";
 import { Editor as CodeMirrorEditor, Position, TextMarker } from "codemirror";
 import { Acl2Response, evaluate, reset } from "./acl2";
 import { ProofBar } from "./ProofBar";
@@ -36,7 +36,6 @@ export class Editor extends React.Component<
   {
     value: string;
     onChange(value: string): void;
-    hidden?: boolean;
     onOutput: (response: Acl2Response) => void;
   },
   { forms: Form[]; verifiedLines: number }
@@ -48,7 +47,7 @@ export class Editor extends React.Component<
 
   render() {
     return (
-      <div id="editor" hidden={this.props.hidden}>
+      <div id="editor">
         <div id="editor-toolbar">
           <button
             aria-label="Save"
@@ -207,7 +206,7 @@ export class Editor extends React.Component<
                 (this.editor ? this.editor.defaultTextHeight() : 0),
             }}
           />
-          <Controlled
+          <CodeMirrorComponent
             options={{
               mode: "commonlisp",
               matchBrackets: true,
@@ -225,7 +224,7 @@ export class Editor extends React.Component<
             value={this.props.value}
           >
             a
-          </Controlled>
+          </CodeMirrorComponent>
         </div>
       </div>
     );

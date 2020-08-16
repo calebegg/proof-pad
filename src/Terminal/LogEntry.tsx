@@ -16,19 +16,24 @@
  */
 
 import React, { useState, useRef, useLayoutEffect, useCallback } from "react";
-import { LogKind } from "../reducer";
+import { LogKind } from "../LogKind";
 
-const KIND_TO_SYMBOL = new Map([[LogKind.ERROR, "×"], [LogKind.INPUT, ">"]]);
+const KIND_TO_SYMBOL = new Map([
+  [LogKind.ERROR, "×"],
+  [LogKind.INPUT, ">"],
+]);
 
-export function LogEntry({kind, value}: { kind: LogKind; value?: string }) {
+export function LogEntry({ kind, value }: { kind: LogKind; value?: string }) {
   const [expanded, setExpanded] = useState(true);
 
-  const measure = useCallback((pre: HTMLPreElement|null) => {
-    console.log(pre);
-    if (pre && pre.clientHeight > 200 && kind !== LogKind.INPUT) {
-      setExpanded(false);
-    }
-  }, [kind]);
+  const measure = useCallback(
+    (pre: HTMLPreElement | null) => {
+      if (pre && pre.clientHeight > 150 && kind !== LogKind.INPUT) {
+        setExpanded(false);
+      }
+    },
+    [kind],
+  );
 
   if (kind === LogKind.WELCOME) {
     return (
@@ -46,10 +51,7 @@ export function LogEntry({kind, value}: { kind: LogKind; value?: string }) {
     );
   }
   return (
-    <pre
-      ref={measure}
-      className={kind == LogKind.ERROR ? "error" : ""}
-    >
+    <pre ref={measure} className={kind == LogKind.ERROR ? "error" : ""}>
       <div
         style={{
           overflow: "hidden",
@@ -68,7 +70,7 @@ export function LogEntry({kind, value}: { kind: LogKind; value?: string }) {
           <button
             className="show-more"
             onClick={() => {
-              setExpanded(true)
+              setExpanded(true);
             }}
           >
             Show more...

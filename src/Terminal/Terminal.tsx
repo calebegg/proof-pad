@@ -16,25 +16,19 @@
  */
 
 import React from "react";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
-import { evaluate, listenForUnhandledError } from "../acl2";
-import { LogKind, recordInput, recordOutput, State } from "../reducer";
+import { evaluate, listenForUnhandledError, Acl2Response } from "../acl2";
+import { LogKind } from "../LogKind";
 import { InputField } from "./InputField";
 import { LogEntry } from "./LogEntry";
 
-interface TerminalStore {
-  log: State["log"];
-  pendingInput: State["pendingInput"];
+interface TerminalProps {
+  log: Array<{ input?: string; output: { kind: LogKind; value?: string } }>;
+  pendingInput: string | undefined;
+  onOutput: (v: Acl2Response) => void;
+  onInput: (v: string) => void;
 }
 
-interface TerminalDispatcher {
-  dispatch: Dispatch;
-}
-
-type TerminalProps = TerminalStore & TerminalDispatcher;
-
-class TerminalImpl extends React.Component<
+export class Terminal extends React.Component<
   TerminalProps,
   {
     running: boolean;
@@ -48,22 +42,22 @@ class TerminalImpl extends React.Component<
     this.state = {
       running: false,
     };
-    listenForUnhandledError(error => {
-      this.props.dispatch(recordOutput({ Kind: "ERROR", Body: error }));
+    listenForUnhandledError((error) => {
+      this.props.onOutput({ Kind: "ERROR", Body: error });
     });
   }
 
   private async run(code: string) {
     this.focusTrap!.focus();
-    this.props.dispatch(recordInput(code));
+    this.props.onInput(code);
     this.setState({
       running: true,
     });
-    let result: string;
     try {
-      this.props.dispatch(recordOutput(await evaluate(code)));
+      const output = await evaluate(code);
+      this.props.onOutput(output);
     } catch (e) {
-      this.props.dispatch(recordOutput({ Kind: "ERROR", Body: `Error: ${e}` }));
+      this.props.onOutput({ Kind: "ERROR", Body: `Error: ${e}` });
     } finally {
       this.setState({ running: false });
       if (document.activeElement === this.focusTrap) {
@@ -81,7 +75,7 @@ class TerminalImpl extends React.Component<
       <div
         id="terminal"
         onClick={async () => {
-          await new Promise(resolve => setTimeout(resolve, 0));
+          await new Promise((resolve) => setTimeout(resolve, 0));
           if (document.getSelection()!.isCollapsed) {
             if (this.state.running) {
               this.focusTrap.focus();
@@ -118,13 +112,13 @@ class TerminalImpl extends React.Component<
           )}
         </div>
         <InputField
-          onInputRef={i => {
+          onInputRef={(i) => {
             this.input = i;
           }}
-          onFocusTrapRef={f => {
+          onFocusTrapRef={(f) => {
             this.focusTrap = f;
           }}
-          onSubmit={c => {
+          onSubmit={(c) => {
             this.run(c);
           }}
           log={this.props.log}
@@ -134,8 +128,3 @@ class TerminalImpl extends React.Component<
     );
   }
 }
-
-export const Terminal = connect((state: State) => ({
-  log: state.log,
-  pendingInput: state.pendingInput,
-}))(TerminalImpl);

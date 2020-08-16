@@ -15,66 +15,75 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import { connect, Provider } from "react-redux";
-import { createStore, Dispatch } from "redux";
 import { Editor } from "./Editor";
-import { doIt, proofPad, recordOutput, State, updateEditor } from "./reducer";
+import { LogKind } from "./LogKind";
 import { Terminal } from "./Terminal/Terminal";
-import { Toolbar } from "./Toolbar";
+import { Acl2Response } from "./acl2";
 
-const store = createStore(proofPad);
+export function Main() {
+  const [editorValue, setEditorValue] = useState(
+    localStorage.getItem("autosave") || "",
+  );
 
-class MainImpl extends React.Component<
-  { dispatch: Dispatch<State>; editorValue: string; tutorialShowing: boolean },
-  { editorHidden: boolean }
-> {
-  state = { editorHidden: false };
+  const [log, setLog] = useState<
+    Array<{
+      input?: string;
+      output: { kind: LogKind; value?: string };
+    }>
+  >([{ output: { kind: LogKind.WELCOME } }]);
 
-  render() {
-    return (
-      <>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          {this.state.editorHidden ? (
-            <></>
-          ) : (
-            <Editor
-              onChange={v => {
-                this.props.dispatch(updateEditor(v));
-              }}
-              value={this.props.editorValue}
-              hidden={this.state.editorHidden}
-              onOutput={r => {
-                this.props.dispatch(recordOutput(r));
-              }}
-            />
-          )}
-        </div>
-        <Toolbar />
-        <Terminal />
-      </>
+  const [pendingInput, setPendingInput] = useState<string | undefined>(
+    undefined,
+  );
+
+  function updateLog(r: Acl2Response) {
+    let kind: LogKind;
+    switch (r.Kind) {
+      case "ERROR":
+        kind = LogKind.ERROR;
+        break;
+      case "SUCCESS":
+        kind = LogKind.SUCCESS;
+        break;
+      default:
+        console.error(`Unexpected response kind: ${r.Kind}`);
+        kind = LogKind.INFO;
+        break;
+    }
+    setLog((log) =>
+      log.concat({
+        input: pendingInput,
+        output: { kind, value: r.Body },
+      }),
     );
+    setPendingInput(undefined);
   }
+
+  return (
+    <>
+      <Editor
+        onChange={(v) => {
+          setEditorValue(v);
+        }}
+        value={editorValue}
+        onOutput={(r) => {
+          updateLog(r);
+        }}
+      />
+      <Terminal
+        log={log}
+        pendingInput={pendingInput}
+        onOutput={(r) => {
+          updateLog(r);
+        }}
+        onInput={(i) => {
+          setPendingInput(i);
+        }}
+      />
+    </>
+  );
 }
 
-document.body.addEventListener("keydown", e => {
-  switch (e.which) {
-    case "L".charCodeAt(0):
-      if (e.ctrlKey) {
-        store.dispatch(doIt(s => ({ ...s, log: [] })));
-      }
-  }
-});
-
-const Main = connect((store: State) => ({
-  editorValue: store.editorValue,
-  tutorialShowing: store.tutorialShowing,
-}))(MainImpl);
-
-ReactDOM.render(
-  <Provider store={store}>
-    <Main />
-  </Provider>,
-  document.getElementById("container"),
-);
+ReactDOM.render(<Main />, document.getElementById("container"));

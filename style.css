@@ -71,22 +71,20 @@ button {
 }
 
 #editor,
-#terminal,
-#tutorial {
+#terminal {
   flex: 1;
   background: white;
 }
 
-#tutorial,
 #editor-toolbar,
 .CodeMirror {
   padding: 0 18px 0 8px;
 }
 
-#terminal,
-#tutorial {
+#terminal {
   overflow-y: scroll;
   overflow-x: hidden;
+  border-left: solid rgba(0, 0, 0, 0.12) 1px;
 }
 
 #editor {
@@ -167,7 +165,7 @@ pre {
 
 .log {
   padding: 8px;
-  border-bottom: solid #ddd 1px;
+  border-bottom: solid rgba(0, 0, 0, 0.12) 1px;
   position: relative;
 }
 
@@ -195,80 +193,11 @@ form,
   color: rgba(0, 0, 0, 0.5);
 }
 
-.toolbar {
-  width: 24px;
-  padding: 12px 0;
-}
-
-.toolbar button {
-  font-size: 24px;
-  border: none;
-  outline: none;
-  z-index: 1;
-  position: relative;
-}
-
-.toolbar > .wrapper:nth-child(1) > button {
-  background: dodgerblue;
-}
-.toolbar > .wrapper:nth-child(2) > button {
-  background: mediumseagreen;
-}
-
-.toolbar > .wrapper {
-  position: relative;
-  margin: 16px -12px;
-}
-
-.toolbar button,
-.toolbar .shadow {
-  border-radius: 50%;
-  height: 48px;
-  width: 48px;
-  line-height: 50px;
-  color: white;
-  transition: box-shadow 0.1s ease-in-out;
-}
-
-.toolbar .shadow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -1;
-  display: block;
-  /* 6dp */
-  box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12),
-    0 3px 5px -1px rgba(0, 0, 0, 0.2);
-}
-
-.toolbar button:hover::before,
-.toolbar button:focus::before {
-  /* 8dp */
-  box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),
-    0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2);
-}
-
-.toolbar button,
-#container > :first-child,
-#container > :last-child {
-  /* 2dp */
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12);
-}
-
-.toolbar button:hover,
-.toolbar button:focus {
-  /* 4dp */
-  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12),
-    0 2px 4px -1px rgba(0, 0, 0, 0.2);
-}
-
 #editor-toolbar {
   display: flex;
   flex-flow: row nowrap;
   flex-shrink: 0;
-  border: solid rgba(0, 0, 0, 0.12);
-  border-width: 1px 0;
+  border-bottom: solid rgba(0, 0, 0, 0.12) 1px;
 }
 
 #editor-toolbar button {
@@ -324,7 +253,6 @@ button.show-more {
     rgb(234, 233, 233)
   );
   border-top: 1px #ddd solid;
-  box-shadow: none;
   padding: 4px 8px;
   bottom: 0;
   left: -24px;

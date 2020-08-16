@@ -28,7 +28,7 @@ let queue: Array<[(v: Acl2Response) => void, (v: {}) => void]>;
 let unhandledErrorCallback: (e: string) => void = defaultCallback;
 
 export function reset() {
-  evaluate(`:ubu "centaur/bridge/top"`).catch(r => {
+  evaluate(`:ubu "centaur/bridge/top"`).catch((r) => {
     unhandledErrorCallback(r);
   });
 }
@@ -74,15 +74,6 @@ export function evaluate(code: string): Promise<Acl2Response> {
   }
   ws.send(code);
   return new Promise((resolver, rejecter) => queue.push([resolver, rejecter]));
-}
-
-export async function evaluateInProgramMode(
-  code: string
-): Promise<Acl2Response> {
-  await evaluate(":program"); // Ignore
-  const response = await evaluate(code);
-  await evaluate(":logic"); // Ignore
-  return response;
 }
 
 export function listenForUnhandledError(cb: (error: string) => void) {

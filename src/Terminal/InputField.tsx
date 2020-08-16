@@ -15,74 +15,67 @@
  * limitations under the License.
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { State } from "../reducer";
 
-export class InputField extends React.Component<
-  {
-    onInputRef: (ref: HTMLInputElement) => void;
-    onFocusTrapRef: (ref: HTMLDivElement) => void;
-    onSubmit: (code: string) => void;
-    log: State["log"];
-    running: boolean;
-  },
-  { code: string }
-> {
-  private historyIdx = 0;
-  state = { code: "" };
+export function InputField(props: {
+  onInputRef: (ref: HTMLInputElement) => void;
+  onFocusTrapRef: (ref: HTMLDivElement) => void;
+  onSubmit: (code: string) => void;
+  log: State["log"];
+  running: boolean;
+}) {
+  const [code, setCode] = useState("");
+  const [historyIdx, setHistoryIdx] = useState(0);
 
-  private handleKeyShortcuts(e: React.KeyboardEvent<HTMLInputElement>) {
+  function handleKeyShortcuts(e: React.KeyboardEvent<HTMLInputElement>) {
+    let currentIdx = historyIdx;
     switch (e.which) {
       case 38: // up
-        if (this.historyIdx >= this.props.log.length) return;
-        this.historyIdx++;
+        if (currentIdx >= props.log.length) return;
+        currentIdx++;
         break;
       case 40: // down
-        if (this.historyIdx === 1) return;
-        this.historyIdx--;
+        if (currentIdx === 1) return;
+        currentIdx--;
         break;
       default:
         return;
     }
-    this.setState({
-      code: this.props.log[this.props.log.length - this.historyIdx].input || "",
-    });
+    setCode(props.log[props.log.length - currentIdx].input || "");
+    setHistoryIdx(currentIdx);
   }
 
-  render() {
-    return (
-      <form
-        id="input"
-        onSubmit={async e => {
-          e.preventDefault();
-          this.props.onSubmit(this.state.code);
-          this.setState({ code: "" });
-          this.historyIdx = 0;
+  return (
+    <form
+      id="input"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        props.onSubmit(code);
+        setCode("");
+        setHistoryIdx(0);
+      }}
+    >
+      <code className="display">{">"}&nbsp;&nbsp;</code>
+      <input
+        spellCheck={false}
+        ref={(i) => {
+          props.onInputRef(i!);
         }}
-      >
-        <code className="display">{">"}&nbsp;&nbsp;</code>
-        <input
-          spellCheck={false}
-          ref={i => {
-            this.props.onInputRef(i!);
-          }}
-          onChange={e => {
-            this.setState({
-              code: e.target.value,
-            });
-          }}
-          onKeyDown={e => this.handleKeyShortcuts(e)}
-          value={this.state.code}
-          disabled={this.props.running}
-          autoFocus
-        />
-        <div
-          ref={f => {
-            this.props.onFocusTrapRef(f!);
-          }}
-          tabIndex={-1}
-        />
-      </form>
-    );
-  }
+        onChange={(e) => {
+          setCode(e.target.value);
+        }}
+        onKeyDown={(e) => handleKeyShortcuts(e)}
+        value={code}
+        disabled={props.running}
+        autoFocus
+      />
+      <div
+        ref={(f) => {
+          props.onFocusTrapRef(f!);
+        }}
+        tabIndex={-1}
+      />
+    </form>
+  );
 }
