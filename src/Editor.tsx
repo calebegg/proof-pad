@@ -79,6 +79,7 @@ export class Editor extends React.Component<
             style={{ display: "none" }}
           />
           <button
+            aria-label="Upload"
             onClick={() => {
               this.fileInput.click(); // Activates the hidden file input.
               const changeHandler = () => {

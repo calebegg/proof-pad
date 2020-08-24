@@ -58,6 +58,7 @@ export function InputField(props: {
     >
       <code className="display">{">"}&nbsp;&nbsp;</code>
       <input
+        aria-label="Terminal input"
         spellCheck={false}
         ref={(i) => {
           props.onInputRef(i!);
