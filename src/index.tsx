@@ -66,6 +66,7 @@ export function Main() {
       <Editor
         onChange={(v) => {
           setEditorValue(v);
+          localStorage.setItem("autosave", v);
         }}
         value={editorValue}
         onOutput={(r) => {

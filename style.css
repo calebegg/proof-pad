@@ -76,11 +76,6 @@ button {
   background: white;
 }
 
-#editor-toolbar,
-.CodeMirror {
-  padding: 0 18px 0 8px;
-}
-
 #terminal {
   overflow-y: scroll;
   overflow-x: hidden;
@@ -220,8 +215,7 @@ form,
 
 div.CodeMirror {
   overflow: visible;
-  height: auto;
-  min-height: calc(100% - 48px);
+  height: 100%;
   background: transparent;
 }
 
@@ -238,9 +232,14 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
 }
 
 .CodeMirror-scroll {
-  height: auto;
+  height: 100%;
   overflow-y: hidden;
   overflow-x: auto;
+}
+
+.CodeMirror-gutters {
+  background: none;
+  border: none;
 }
 
 button.show-more {

@@ -211,6 +211,7 @@ export class Editor extends React.Component<
             options={{
               mode: "commonlisp",
               matchBrackets: true,
+              lineNumbers: true,
             }}
             onBeforeChange={(editor, data, value) => {
               this.props.onChange(value);

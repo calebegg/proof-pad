@@ -16,13 +16,12 @@
  */
 
 import React, { useState } from "react";
-import { State } from "../reducer";
 
 export function InputField(props: {
   onInputRef: (ref: HTMLInputElement) => void;
   onFocusTrapRef: (ref: HTMLDivElement) => void;
   onSubmit: (code: string) => void;
-  log: State["log"];
+  log: Array<{ input?: string }>;
   running: boolean;
 }) {
   const [code, setCode] = useState("");
