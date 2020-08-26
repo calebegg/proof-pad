@@ -34,7 +34,6 @@ export function reset() {
 }
 
 ws = new WebSocket(`ws:35.227.97.92/acl2`);
-// ws.addEventListener('error', onUpdate);
 ws.addEventListener("message", onUpdate);
 ws.addEventListener("close", onUpdate);
 queue = [];
@@ -42,6 +41,7 @@ queue = [];
 function defaultCallback(e: {}) {
   console.warn("No handler for", e);
 }
+
 function onUpdate(e: Event) {
   let resolver: (v: Acl2Response) => void;
   let rejecter: (e: string) => void;
