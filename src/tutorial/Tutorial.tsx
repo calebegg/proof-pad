@@ -1,3 +1,9 @@
+import {
+  faArrowLeft,
+  faArrowRight,
+  faEdit,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { MDXProvider } from "@mdx-js/react";
 import React, { useState } from "react";
 import { ClickablePre } from "./ClickablePre";
@@ -41,30 +47,41 @@ const PAGES = [
   <ProofsFail4 />,
 ];
 
-export function Tutorial() {
+export function Tutorial({ onEdit }: { onEdit: () => void }) {
   const [pageNum, setPageNum] = useState(0);
 
   return (
     <div id="tutorial">
-      <button
-        onClick={() => {
-          setPageNum((n) => n - 1);
-        }}
-        disabled={pageNum == 0}
-      >
-        previous
-      </button>
-      <button
-        onClick={() => {
-          setPageNum((n) => n + 1);
-        }}
-        disabled={pageNum == PAGES.length - 1}
-      >
-        next
-      </button>
-      <MDXProvider components={{ pre: ClickablePre }}>
-        {PAGES[pageNum]}
-      </MDXProvider>
+      <div id="toolbar">
+        <button
+          onClick={() => {
+            setPageNum((n) => n - 1);
+          }}
+          disabled={pageNum == 0}
+        >
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </button>
+        <button
+          onClick={() => {
+            setPageNum((n) => n + 1);
+          }}
+          disabled={pageNum == PAGES.length - 1}
+        >
+          <FontAwesomeIcon icon={faArrowRight} />
+        </button>
+        <button
+          onClick={() => {
+            onEdit();
+          }}
+        >
+          <FontAwesomeIcon icon={faEdit} />
+        </button>
+      </div>
+      <div className="content">
+        <MDXProvider components={{ pre: ClickablePre }}>
+          {PAGES[pageNum]}
+        </MDXProvider>
+      </div>
     </div>
   );
 }

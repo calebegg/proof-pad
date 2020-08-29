@@ -177,14 +177,14 @@ form,
   color: rgba(0, 0, 0, 0.5);
 }
 
-#editor-toolbar {
+#toolbar {
   display: flex;
   flex-flow: row nowrap;
   flex-shrink: 0;
   border-bottom: solid rgba(0, 0, 0, 0.12) 1px;
 }
 
-#editor-toolbar button {
+#toolbar button {
   width: 40px;
   height: 40px;
   margin: 4px;
@@ -193,8 +193,8 @@ form,
   border-radius: 3px;
 }
 
-#editor-toolbar button:focus,
-#editor-toolbar button:hover {
+#toolbar button:focus,
+#toolbar button:hover {
   background: rgba(0, 0, 0, 0.04);
 }
 
@@ -280,6 +280,9 @@ button[aria-label]:hover::before {
 
 #tutorial {
   overflow-y: scroll;
+}
+
+#tutorial .content {
   padding: 8px;
 }
 

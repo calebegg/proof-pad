@@ -25,7 +25,7 @@ import { Tutorial } from "./tutorial/Tutorial";
 
 export function Main() {
   const [editorValue, setEditorValue] = useState(
-    localStorage.getItem("autosave") || "",
+    () => localStorage.getItem("autosave") || "",
   );
 
   const [showTutorial, setShowTutorial] = useState(false);
@@ -67,7 +67,11 @@ export function Main() {
   return (
     <>
       {showTutorial ? (
-        <Tutorial />
+        <Tutorial
+          onEdit={() => {
+            setShowTutorial(false);
+          }}
+        />
       ) : (
         <Editor
           onChange={(v) => {
@@ -77,6 +81,9 @@ export function Main() {
           value={editorValue}
           onOutput={(r) => {
             updateLog(r);
+          }}
+          onEnterTutorial={() => {
+            setShowTutorial(true);
           }}
         />
       )}
