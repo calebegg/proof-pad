@@ -1,0 +1,9 @@
+You may have come up with something like this:
+
+    (defun sum (xs)
+      (if (endp xs)
+          0
+          (+ (first xs)
+             (sum (rest xs)))))
+
+Try to come up with some theorems that verify reasonable properties of `sum`

@@ -1,0 +1,14 @@
+Similar to `factorial`, we want `rep` to recurse towards zero. We can use the
+`zp` predicate:
+
+    (defun rep (x n)
+      (if (zp n)
+          ... ; What to do if n is 0
+          ... ; What to do if n is not zero
+      ))
+
+You can produce an empty list by calling `(list)` with no arguments, or,
+equivalently, you can just use `nil` (Lisp's special name for an empty list) or
+`()`.
+
+The next page has the solution.

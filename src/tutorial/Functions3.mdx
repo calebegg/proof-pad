@@ -1,0 +1,23 @@
+You might be tempted to say "too bad, don't use it that way", which makes sense.
+But with ACL2, our goal is to be able to prove theorems about `factorial`, and
+it's impossible to prove anything about a function that might or might not
+terminate. So in order to continue, we need a version of `factorial` that is
+**total** -- that is, it returns a value no matter what the input is.
+
+Thankfully, this is a common problem, and ACL2 has a solution. There's a special
+predicate that will do what we want here. It's `zp` -- the "zero predicate".
+What it says is, roughly, "check if the argument is a non-negative integer, and
+if so, whether or not it's zero". If the argument is zero _or_ if the argument
+is not an integer -- if it's one of the arguments we consider invalid for
+`factorial` -- then we will return `1`. It might not make sense that
+`(factorial -1)` is equal to `1`, but it isn't important for our purposes.
+
+`zp` also uses an ACL2 feature called guards. This prevents you from calling it
+with an invalid argument.
+
+Now we can define `factorial` correctly:
+
+    (defun factorial (n)
+      (if (zp n)
+          1
+          (* n (factorial (- n 1)))))

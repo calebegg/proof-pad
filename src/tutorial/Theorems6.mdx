@@ -1,0 +1,14 @@
+Here are a few examples that demonstrate some of the capabilities of ACL2
+
+    (thm (= (sum (list a b c))
+            (+ a b c)))
+
+<!--sep-->
+
+    (thm (= (sum (append xs ys))
+            (+ (sum xs) (sum ys))))
+
+<!--sep-->
+
+    (thm (= (sum (reverse xs))
+            (sum xs)))

@@ -1,0 +1,14 @@
+## 3. Theorems
+
+Now that we have a function that provably terminates, we can finally get to the
+cool stuff: theorem proving. Theorems are written with `thm` -- try it out:
+
+    (thm (= (* x 2) (+ x x))) ; QED
+
+<!--sep-->
+
+    (thm (> (factorial n) 0)) ; QED
+
+<!--sep-->
+
+    (thm (> x (/ x 2))) ; Fails -- can you tell why?

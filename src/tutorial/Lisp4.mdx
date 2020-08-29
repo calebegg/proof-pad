@@ -1,0 +1,23 @@
+We can also define our own functions To do that, we use the special form
+"defun".
+
+> `(defun` _name_ `(` _arguments_ `)` _body_ `)`
+
+Here's an example:
+
+    (defun triple (x) (* 3 x))
+
+This new function `triple` will triple any number you pass into it. Click above
+to define it, then try it out:
+
+    (triple 10) ; 30
+
+Next, let's try a function that works on lists:
+
+    (defun snoc (xs elem)
+      (append xs
+              (list elem)))
+
+This function takes in two arguments: a list, and an element to be added to that
+list at the end. It's like a backwards version of `cons`, which is why I called
+it `snoc`. Try it out!

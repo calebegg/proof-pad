@@ -1,0 +1,24 @@
+ACL2 has several built-in data types, but we're only going to work with two:
+numbers and lists. Lists are a fundamental part of how Lisp represents and
+manipulates data. The function used to create a list is called, appropriately,
+`list`:
+
+    (list 8 6 7 5 3 0 9)
+
+There are several built-in functions that act on lists, such as
+
+    (append (list 1 2 3) (list 4 5 6))
+
+<!--sep-->
+
+    (cons 1 (list 2 3 4))
+
+<!--sep-->
+
+    (first (list 1 2 3))
+
+<!--sep-->
+
+    (rest (list 1 2 3))
+
+Try them out to see what they do.

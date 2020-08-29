@@ -1,0 +1,12 @@
+Our approach to this function should be similar to what we did for `factorial`.
+Instead of a number, we're now dealing with a list, so instead of checking for
+zero, let's check for an empty list. That is, the structure should look like
+
+    (defun sum (xs)
+      (if (endp xs)
+          ... ; What is the sum of everything in an empty list?
+          ... ; How can we get the sum using first, rest, and sum itself?
+          ))
+
+Don't worry too much if it still isn't clear; you'll get to see more examples of
+this kind of function.

@@ -1,0 +1,26 @@
+## 4. When Proofs Fail
+
+So far, all of the theorems we've worked on have been successful on the first
+try. These proofs are interesting, but ACL2 users rarely look closely at
+successful proofs. The tricky cases, as a user, are trying to diagnose why a
+proof attempt failed.
+
+Generally, of course, there are two reasons a proof attempt will fail:
+
+1. The theorem, as stated, isn't true.
+2. ACL2 needs some guidance.
+
+In my experience, (1) is vastly more common than (2), so we'll start with an
+example of that.
+
+First, we need to define a new function, `rep`. It takes two arguments; let's
+call them `x` and `n`. `(rep x n)` returns a list with `x` repeated `n` times.
+Example:
+
+    (rep 2 5) ; (list 2 2 2 2 2)
+
+As a reminder, to add an item to a list, use the `cons` function:
+
+    (cons 3 (list 4 5)) ; (list 3 4 5)
+
+Take a pass at defining `rep` now, and go to the next page if you need a hint.

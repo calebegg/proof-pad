@@ -17,6 +17,14 @@
 
 import React, { useState } from "react";
 
+let setCodeRef: (code: string) => void;
+let inputRef: HTMLInputElement;
+
+export function setInputCode(code: string) {
+  setCodeRef(code);
+  inputRef.focus();
+}
+
 export function InputField(props: {
   onInputRef: (ref: HTMLInputElement) => void;
   onFocusTrapRef: (ref: HTMLDivElement) => void;
@@ -25,6 +33,7 @@ export function InputField(props: {
   running: boolean;
 }) {
   const [code, setCode] = useState("");
+  setCodeRef = setCode;
   const [historyIdx, setHistoryIdx] = useState(0);
 
   function handleKeyShortcuts(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -61,6 +70,7 @@ export function InputField(props: {
         spellCheck={false}
         ref={(i) => {
           props.onInputRef(i!);
+          inputRef = i;
         }}
         onChange={(e) => {
           setCode(e.target.value);

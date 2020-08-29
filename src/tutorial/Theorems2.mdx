@@ -1,0 +1,28 @@
+Let's prove that the built in `append` function from earlier is associative;
+that is, `(append (append xs ys) zs)` equals `(append xs (append ys zs))`.
+
+    (thm (equal (append (append xs ys) zs)
+                (append xs (append ys zs))))
+
+This is a long, (but interesting!) proof. If you're interested in the details,
+there's a good, relatively non-technical discussion of this proof by the authors
+of ACL2
+[here](http://www.cs.utexas.edu/users/moore/acl2/manuals/current/manual/?topic=ACL2____The_02Proof_02of_02the_02Associativity_02of_02App).
+
+For theorems that ACL2 can't prove on its own, you'll often have to provide
+lemmas; theorems that are added to the ACL2 logical world and can then be used
+in proving future theorems. To add a theorem to the logical world, use
+`(defthm ...)` and give it a name.
+
+    (defthm append-associative
+      (equal (append (append xs ys) zs)
+             (append xs (append ys zs))))
+
+One final note before we move on to more advanced theorems.
+
+Theorems added using `defthm` must be written with care; the prover blindly
+replaces the left side with the right side whenever it finds something that
+looks like the left side and can prove all of the `implies` hypotheses. If we
+admitted a different version of append-associative that converted
+`(append xs (append ys zs))` to `(append (append xs ys))`, the theorem prover
+would loop forever, applying these two rules repeatedly.

@@ -1,0 +1,25 @@
+Another important type of built-in function is a predicate. These end in "p" and
+are used to test whether some condition holds for the values you pass in. Here
+are some examples:
+
+    (evenp 8) ; checks whether 8 is an even number
+
+<!--sep-->
+
+    (endp (list 1 2)) ; checks whether a list is empty -- "at the end"
+
+Functions can take into account the results of these predicates using `if`.
+Here's an example:
+
+    (defun hailstone (x)
+      (if (evenp x) ; condition
+          (/ x 2) ; what to do if it passes
+          (+ (* 3 x) 1))) ; what to do if it fails
+
+Try out our new function and see what it does for even and odd numbers:
+
+    (hailstone 34)
+
+<!--sep-->
+
+    (hailstone 35)

@@ -1,0 +1,21 @@
+You might have come up with a definition for `rep` similar to this one:
+
+    (defun rep (x n)
+      (if (zp n)
+          nil
+          (cons x
+                (rep x (- n 1)))))
+
+You might suppose that this theorem makes sense:
+
+    (thm (= (sum (rep 1 n))
+            n))
+
+However, if you try it, you'll see it fails with `(IMPLIES (ZP N) (EQUAL 0 N))`.
+What it's saying is that if `(zp n)` is true, we expect `n` to equal `0`. But
+wait -- `(zp n)` is also true if `n` is not a natural number. We haven't told
+ACL2 to expect `n` to be a natural number. Here's how we do that:
+
+    (thm (implies (natp n)
+                  (= (sum (rep 1 n))
+                     n)))

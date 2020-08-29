@@ -1,0 +1,14 @@
+## 2. Recursive Functions
+
+Next, we're going to enter a recursive function; `factorial`. The factorial of a
+natural number is the product of the number and all the natural numbers below
+it. In other words, `(factorial n)` = `(* n (factorial (- n 1)))`. As a special
+case (called the "base case"), `(factorial 0)` = 1. An approach might be this:
+
+    (defun factorial-almost (n)
+      (declare (xargs :mode :program)) ; Don't worry about this line yet
+      (if (= n 0)
+          1
+          (* n (factorial-almost (- n 1)))))
+
+Try it out and see if you can find the problem with this approach.

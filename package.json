@@ -1,19 +1,23 @@
 {
   "devDependencies": {
+    "@mdx-js/parcel-plugin-mdx": "^1.6.16",
     "@types/codemirror": "0.0.97",
+    "@types/mdx-js__react": "^1.5.2",
     "@types/react": "^16.9.46",
     "@types/react-dom": "^16.9.8",
     "parcel": "^2.0.0-nightly.366",
     "typescript": "^3.9.7"
   },
   "dependencies": {
+    "@mdx-js/react": "^1.6.16",
     "codemirror": "^5.56.0",
     "react": "^16.13.1",
     "react-codemirror2": "^7.2.1",
     "react-dom": "^16.13.1"
   },
   "prettier": {
-    "trailingComma": "all"
+    "trailingComma": "all",
+    "proseWrap": "always"
   },
   "browserslist": [
     "since 2017-06"

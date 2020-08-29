@@ -91,17 +91,6 @@ button {
   position: relative;
 }
 
-#editor > textarea {
-  border: none;
-  outline: none;
-  flex: 1;
-  background: #eee;
-}
-
-#editor > textarea:focus {
-  background: white;
-}
-
 #proofbar {
   width: 40px;
 }
@@ -271,7 +260,8 @@ button[aria-label]::before {
 
   position: absolute;
   bottom: 50%;
-  right: 130%;
+  left: 130%;
+  z-index: 1;
 
   margin-bottom: -14px;
   padding: 7px;
@@ -286,4 +276,17 @@ button[aria-label]::before {
 
 button[aria-label]:hover::before {
   display: block;
+}
+
+#tutorial {
+  overflow-y: scroll;
+  padding: 8px;
+}
+
+pre.clickable {
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.04);
+  border-left: solid rgba(0, 0, 0, 0.5) 2px;
+  padding: 4px;
+  margin-bottom: 8px;
 }

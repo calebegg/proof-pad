@@ -1,0 +1,32 @@
+Did you figure it out? If not, try running this:
+
+    (factorial-almost -1)
+
+<!--sep-->
+
+    (factorial-almost 1/2)
+
+Oops. The factorial operation is not well-defined for negative numbers or
+fractions. It's easy to see why this doesn't work. Here's what ACL2 does:
+
+> `(factorial-almost -1)` is n = 0? No. `(* -1 (factorial-almost (- 1 1)))` >
+> `(* -1 (factorial-almost -2))` is n = 0? No.
+> `(* -1 (* -2 (factorial-almost -3)))` is n = 0? No.
+> `(* -1 (* -2 (* -3 (factorial-almost -4))))` etc.
+
+This would continue forever if it wasn't for a recursion limit in the Lisp
+interpreter. Instead, you get a "stack overflow" error.
+
+That line about using `:program` mode is a way to get ACL2 to allow us to write
+a function like this that may never terminate. Normally, ACL2 proves that
+functions terminate when you define them. If you'd like, you can see what ACL2
+does if we try to define `factorial-almost` normally:
+
+    (defun factorial-almost (n)
+      (if (= n 0)
+          1
+          (* n (factorial-almost (- n 1)))))
+
+The result is a failed proof attempt. It's complex and hard to interpret, but
+the jist is that ACL2 is telling us what we now know; `factorial-almost` doesn't
+always terminate.

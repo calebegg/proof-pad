@@ -21,11 +21,14 @@ import { Editor } from "./Editor";
 import { LogKind } from "./LogKind";
 import { Terminal } from "./Terminal/Terminal";
 import { Acl2Response } from "./acl2";
+import { Tutorial } from "./tutorial/Tutorial";
 
 export function Main() {
   const [editorValue, setEditorValue] = useState(
     localStorage.getItem("autosave") || "",
   );
+
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const [log, setLog] = useState<
     Array<{
@@ -63,16 +66,20 @@ export function Main() {
 
   return (
     <>
-      <Editor
-        onChange={(v) => {
-          setEditorValue(v);
-          localStorage.setItem("autosave", v);
-        }}
-        value={editorValue}
-        onOutput={(r) => {
-          updateLog(r);
-        }}
-      />
+      {showTutorial ? (
+        <Tutorial />
+      ) : (
+        <Editor
+          onChange={(v) => {
+            setEditorValue(v);
+            localStorage.setItem("autosave", v);
+          }}
+          value={editorValue}
+          onOutput={(r) => {
+            updateLog(r);
+          }}
+        />
+      )}
       <Terminal
         log={log}
         pendingInput={pendingInput}
