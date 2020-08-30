@@ -6,7 +6,11 @@ export function ClickablePre({ children }: { children: any }) {
     <pre className="clickable">
       <code
         onClick={() => {
-          setInputCode(children.props.children.replace(/\s*;.*\n/g, ""));
+          setInputCode(
+            children.props.children
+              .replace(/\s*;.*\n/g, "")
+              .replace(/\s+/g, " "),
+          );
         }}
       >
         {children}
