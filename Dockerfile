@@ -9,5 +9,6 @@ RUN CGO_ENABLED=0 go install acl2
 #COPY --from=0 /go/bin/acl2 .
 #COPY --from=0 /go/bin/acl2 .
 COPY acl2_image acl2_image
+COPY dracula dracula
 ENV PORT 8080
 CMD ["/go/bin/acl2"]
