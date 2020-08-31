@@ -20,7 +20,7 @@ import "codemirror/mode/commonlisp/commonlisp";
 import React from "react";
 import { Controlled as CodeMirrorComponent } from "react-codemirror2";
 import { Editor as CodeMirrorEditor, Position, TextMarker } from "codemirror";
-import { Acl2Response, evaluate, reset } from "./acl2";
+import { Acl2Response, evaluate, reset } from "../acl2";
 import { ProofBar } from "./ProofBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {

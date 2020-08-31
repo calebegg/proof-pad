@@ -15,14 +15,11 @@
  * limitations under the License.
  */
 
-import { WebSocket } from "./websocket";
-
 export interface Acl2Response {
   Kind: string;
   Body: string;
 }
 
-//const ws = new WebSocket(`ws:35.227.97.92/acl2`);
 let ws: WebSocket;
 let queue: Array<[(v: Acl2Response) => void, (v: {}) => void]>;
 let unhandledErrorCallback: (e: string) => void = defaultCallback;

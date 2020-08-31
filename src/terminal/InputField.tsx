@@ -70,7 +70,7 @@ export function InputField(props: {
         spellCheck={false}
         ref={(i) => {
           props.onInputRef(i!);
-          inputRef = i;
+          inputRef = i!;
         }}
         onChange={(e) => {
           setCode(e.target.value);

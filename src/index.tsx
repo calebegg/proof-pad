@@ -17,9 +17,9 @@
 
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import { Editor } from "./Editor";
+import { Editor } from "./editor/Editor";
 import { LogKind } from "./LogKind";
-import { Terminal } from "./Terminal/Terminal";
+import { Terminal } from "./terminal/Terminal";
 import { Acl2Response } from "./acl2";
 import { Tutorial } from "./tutorial/Tutorial";
 

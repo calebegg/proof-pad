@@ -1,5 +1,5 @@
 import React from "react";
-import { setInputCode } from "../Terminal/InputField";
+import { setInputCode } from "../terminal/InputField";
 
 export function ClickablePre({ children }: { children: any }) {
   return (
