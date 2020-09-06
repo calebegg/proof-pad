@@ -3,17 +3,17 @@
     "@mdx-js/parcel-plugin-mdx": "^1.6.16",
     "@types/codemirror": "0.0.97",
     "@types/mdx-js__react": "^1.5.2",
-    "@types/react": "^16.9.46",
+    "@types/react": "^16.9.49",
     "@types/react-dom": "^16.9.8",
-    "parcel": "^2.0.0-nightly.366",
-    "typescript": "^3.9.7"
+    "parcel": "^2.0.0-nightly.389",
+    "typescript": "^4.0.2"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
     "@fortawesome/react-fontawesome": "^0.1.11",
     "@mdx-js/react": "^1.6.16",
-    "codemirror": "^5.56.0",
+    "codemirror": "^5.57.0",
     "react": "^16.13.1",
     "react-codemirror2": "^7.2.1",
     "react-dom": "^16.13.1"
