@@ -193,6 +193,7 @@ export class Editor extends React.Component<
               mode: "commonlisp",
               matchBrackets: true,
               lineNumbers: true,
+              viewportMargin: Infinity,
             }}
             onBeforeChange={(editor, data, value) => {
               this.props.onChange(value);
