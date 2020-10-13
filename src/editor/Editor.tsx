@@ -15,22 +15,21 @@
  * limitations under the License.
  */
 
+import {
+  faQuestionCircle,
+  faRedo,
+  faSave,
+  faUndo,
+  faUpload,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Editor as CodeMirrorEditor, Position, TextMarker } from "codemirror";
 import "codemirror/addon/edit/matchbrackets";
 import "codemirror/mode/commonlisp/commonlisp";
 import React from "react";
 import { Controlled as CodeMirrorComponent } from "react-codemirror2";
-import { Editor as CodeMirrorEditor, Position, TextMarker } from "codemirror";
 import { Acl2Response, evaluate, reset } from "../acl2";
 import { ProofBar } from "./ProofBar";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCoffee,
-  faQuestionCircle,
-  faRedo,
-  faUndo,
-  faUpload,
-  faSave,
-} from "@fortawesome/free-solid-svg-icons";
 
 /** A top-level s-expression from the editor */
 export interface Form {
