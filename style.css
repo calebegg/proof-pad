@@ -93,6 +93,7 @@ button {
 
 #proofbar {
   width: 40px;
+  position: relative;
 }
 
 #proofbar > .form {
@@ -182,6 +183,8 @@ form,
   flex-flow: row nowrap;
   flex-shrink: 0;
   border-bottom: solid rgba(0, 0, 0, 0.12) 1px;
+  z-index: 1;
+  background: white;
 }
 
 #toolbar button {
@@ -218,13 +221,6 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
   border: solid red 1px;
   margin: -1px;
   color: #997;
-}
-
-.CodeMirror-scroll {
-  height: auto;
-  min-height: 100%;
-  overflow-y: hidden;
-  overflow-x: auto;
 }
 
 .CodeMirror-gutters {

@@ -47,11 +47,11 @@ export class Editor extends React.Component<
     onOutput: (response: Acl2Response) => void;
     onEnterTutorial: () => void;
   },
-  { forms: Form[]; verifiedLines: number }
+  { forms: Form[]; verifiedLines: number; scrollOffset: number }
 > {
   private fileInput!: HTMLInputElement;
   private editor: CodeMirrorEditor | null = null;
-  state = { forms: [] as Form[], verifiedLines: 0 };
+  state = { forms: [] as Form[], verifiedLines: 0, scrollOffset: 0 };
   readOnlyMarker?: TextMarker;
 
   render() {
@@ -126,9 +126,8 @@ export class Editor extends React.Component<
             display: "flex",
             flexDirection: "row",
             flex: 1,
-            overflowY: "scroll",
-            overflowX: "hidden",
             position: "relative",
+            height: "100%",
           }}
         >
           <ProofBar
@@ -173,6 +172,7 @@ export class Editor extends React.Component<
               });
               this.computeForms();
             }}
+            offset={this.state.scrollOffset}
           />
           <div
             className="read-only-background"
@@ -181,7 +181,7 @@ export class Editor extends React.Component<
               position: "absolute",
               left: 40,
               right: 0,
-              top: 0,
+              top: -this.state.scrollOffset,
               height:
                 this.state.verifiedLines *
                 (this.editor ? this.editor.defaultTextHeight() : 0),
@@ -192,13 +192,15 @@ export class Editor extends React.Component<
               mode: "commonlisp",
               matchBrackets: true,
               lineNumbers: true,
-              viewportMargin: Infinity,
             }}
             onBeforeChange={(editor, data, value) => {
               this.props.onChange(value);
             }}
             onChange={(editor, data, value) => {
               this.computeForms();
+            }}
+            onScroll={(editor, value) => {
+              this.setState({ ...this.state, scrollOffset: value.top });
             }}
             editorDidMount={(e) => {
               this.editor = e;

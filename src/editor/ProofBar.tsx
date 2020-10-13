@@ -6,12 +6,13 @@ interface ProofBarProps {
   verifiedHeight: number;
   advanceTo: (i: number) => void;
   reset: () => void;
+  offset: number;
 }
 
 export function ProofBar(props: ProofBarProps) {
   const [mouseIndex, setMouseIndex] = useState(-1);
   return (
-    <div id="proofbar">
+    <div id="proofbar" style={{ top: -props.offset }}>
       {props.verifiedHeight > 0 ? (
         <div
           className="form"
