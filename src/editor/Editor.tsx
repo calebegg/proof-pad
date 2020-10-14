@@ -209,6 +209,7 @@ export class Editor extends React.Component<
               this.editor = e;
               this.computeForms();
               e.on("inputRead", (e, c) => {
+                // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/48799
                 if (c.text[0] == "(") (e as any).showHint();
               });
             }}
