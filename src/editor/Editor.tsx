@@ -116,6 +116,7 @@ export class Editor extends React.Component<
             <FontAwesomeIcon icon={faRedo} />
           </button>
           <button
+            aria-label="ACL2 tutorial"
             onClick={() => {
               this.props.onEnterTutorial();
             }}
