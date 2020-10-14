@@ -214,9 +214,7 @@ export class Editor extends React.Component<
               });
             }}
             value={this.props.value}
-          >
-            a
-          </CodeMirrorComponent>
+          ></CodeMirrorComponent>
         </div>
       </div>
     );
