@@ -16,6 +16,7 @@
 
 @import url("./node_modules/codemirror/lib/codemirror.css");
 @import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Roboto+Mono:400");
+@import url("./node_modules/codemirror/addon/hint/show-hint.css");
 
 [hidden]:not([hidden="false"]) {
   display: none !important;
