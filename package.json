@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "@mdx-js/parcel-plugin-mdx": "^1.6.18",
+    "@mdx-js/mdx": "^1.6.18",
     "@types/codemirror": "0.0.98",
     "@types/mdx-js__react": "^1.5.3",
     "@types/react": "^16.9.52",
