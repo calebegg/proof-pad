@@ -270,6 +270,7 @@ button[aria-label]::before {
   text-align: center;
   font-size: 14px;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 button[aria-label]:hover::before {
