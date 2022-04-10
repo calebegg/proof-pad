@@ -1,7 +1,8 @@
 {
   "devDependencies": {
-    "@mdx-js/mdx": "^1.6.18",
-    "@types/codemirror": "0.0.98",
+    "@mdx-js/mdx": "^2.1.1",
+    "@parcel/transformer-mdx": "^2.4.1",
+    "@types/codemirror": "5.60.5",
     "@types/mdx-js__react": "^1.5.3",
     "@types/react": "^16.9.52",
     "@types/react-dom": "^16.9.8",
@@ -9,10 +10,10 @@
     "typescript": "^4.0.3"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.32",
-    "@fortawesome/free-solid-svg-icons": "^5.15.1",
+    "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@fortawesome/react-fontawesome": "^0.1.11",
-    "@mdx-js/react": "^1.6.18",
+    "@mdx-js/react": "^1.6.22",
     "codemirror": "^5.58.1",
     "react": "^16.14.0",
     "react-codemirror2": "^7.2.1",
