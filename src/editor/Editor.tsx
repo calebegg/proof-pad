@@ -19,7 +19,7 @@ import { Editor as CodeMirrorEditor, Position, TextMarker } from "codemirror";
 import "codemirror/addon/edit/matchbrackets";
 import "codemirror/addon/hint/show-hint";
 import "codemirror/mode/commonlisp/commonlisp";
-import React from "react";
+import React, { useState } from "react";
 import { Controlled as CodeMirrorComponent } from "react-codemirror2";
 import { Acl2Response, evaluate, reset } from "../acl2";
 import { ProofBar } from "./ProofBar";
@@ -35,135 +35,30 @@ export interface Form {
   end: Position;
 }
 
-export class Editor extends React.Component<
-  {
-    value: string;
-    onChange(value: string): void;
-    onOutput: (response: Acl2Response) => void;
-    onEnterTutorial: () => void;
-  },
-  { forms: Form[]; verifiedLines: number; scrollOffset: number }
-> {
-  private editor: CodeMirrorEditor | null = null;
-  state = { forms: [] as Form[], verifiedLines: 0, scrollOffset: 0 };
-  readOnlyMarker?: TextMarker;
+export function Editor({
+  value,
+  onChange,
+  onOutput,
+  onEnterTutorial,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onOutput: (response: Acl2Response) => void;
+  onEnterTutorial: () => void;
+}) {
+  const [editor, setEditor] = useState<CodeMirrorEditor | null>(null);
+  const [verifiedLines, setVerifiedLines] = useState(0);
+  const [forms, setForms] = useState<Form[]>([]);
+  const [scrollOffset, setScrollOffset] = useState(0);
 
-  render() {
-    return (
-      <div id="editor">
-        <Toolbar
-          editor={this.editor}
-          onEnterTutorial={this.props.onEnterTutorial}
-          onLoad={(value) => {
-            this.props.onChange(value);
-          }}
-          value={this.props.value}
-        />
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            flex: 1,
-            position: "relative",
-            height: "100%",
-          }}
-        >
-          <ProofBar
-            forms={this.state.forms}
-            verifiedHeight={
-              this.editor
-                ? this.state.verifiedLines * this.editor!.defaultTextHeight()
-                : 0
-            }
-            advanceTo={async (index) => {
-              if (!this.editor) return;
-              const forms = [...this.state.forms];
-              let verifiedLines = this.state.verifiedLines;
-              for (let i = 0; i <= index; i++) {
-                const form = forms.shift()!;
-                const response = await evaluate(form.source);
-                this.props.onOutput(response);
-
-                if (response.Kind !== "SUCCESS") {
-                  forms.unshift(form);
-                  break;
-                }
-
-                verifiedLines = form.end.line + 1;
-                if (this.readOnlyMarker) this.readOnlyMarker.clear();
-                this.readOnlyMarker = this.editor.markText(
-                  this.editor.posFromIndex(0),
-                  form.end,
-                  {
-                    readOnly: true,
-                  },
-                );
-              }
-              this.setState({ ...this.state, forms, verifiedLines });
-            }}
-            reset={async () => {
-              await reset();
-              if (this.readOnlyMarker) this.readOnlyMarker.clear();
-              this.setState({
-                ...this.state,
-                verifiedLines: 0,
-              });
-              this.computeForms();
-            }}
-            offset={this.state.scrollOffset}
-          />
-          <div
-            className="read-only-background"
-            style={{
-              background: "#ddd",
-              position: "absolute",
-              left: 40,
-              right: 0,
-              top: -this.state.scrollOffset,
-              height:
-                this.state.verifiedLines *
-                (this.editor ? this.editor.defaultTextHeight() : 0),
-            }}
-          />
-          <CodeMirrorComponent
-            options={{
-              mode: "commonlisp",
-              matchBrackets: true,
-              lineNumbers: true,
-              extraKeys: { "Ctrl-Space": "autocomplete" },
-            }}
-            onBeforeChange={(_editor, _data, value) => {
-              this.props.onChange(value);
-            }}
-            onChange={() => {
-              this.computeForms();
-            }}
-            onScroll={(_editor, value) => {
-              this.setState({ ...this.state, scrollOffset: value.top });
-            }}
-            editorDidMount={(e) => {
-              this.editor = e;
-              this.computeForms();
-              e.on("inputRead", (e, c) => {
-                // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/48799
-                if (c.text[0] == "(") (e as any).showHint();
-              });
-            }}
-            value={this.props.value}
-          ></CodeMirrorComponent>
-        </div>
-      </div>
-    );
-  }
-
-  computeForms() {
-    if (!this.editor) return;
+  function computeForms() {
+    if (!editor) return;
     let nestLevel = 0;
     let forms: Form[] = [];
     let source = "";
-    let startingLine = this.state.verifiedLines;
-    outer: for (let i = startingLine; i < this.editor.lastLine() + 1; i++) {
-      for (const token of this.editor.getLineTokens(i)) {
+    let startingLine = verifiedLines;
+    outer: for (let i = startingLine; i < editor.lastLine() + 1; i++) {
+      for (const token of editor.getLineTokens(i)) {
         if (token.type === "comment") continue;
         source += token.string;
         if (!token.type) continue;
@@ -178,7 +73,7 @@ export class Editor extends React.Component<
         }
         if (nestLevel == 0) {
           forms.push({
-            height: (i - startingLine + 1) * this.editor.defaultTextHeight(),
+            height: (i - startingLine + 1) * editor.defaultTextHeight(),
             source,
             end: { line: i, ch: token.end },
           });
@@ -187,8 +82,99 @@ export class Editor extends React.Component<
         }
       }
     }
-    this.setState({ ...this.state, forms });
+    setForms(forms);
   }
+
+  return (
+    <div id="editor">
+      <Toolbar
+        editor={editor}
+        onEnterTutorial={onEnterTutorial}
+        onLoad={(value) => {
+          onChange(value);
+        }}
+        value={value}
+      />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          flex: 1,
+          position: "relative",
+          height: "100%",
+        }}
+      >
+        <ProofBar
+          forms={forms}
+          verifiedHeight={
+            editor ? verifiedLines * editor!.defaultTextHeight() : 0
+          }
+          advanceTo={async (index) => {
+            if (!editor) return;
+            const f = [...forms];
+            let v = verifiedLines;
+            for (let i = 0; i <= index; i++) {
+              const form = f.shift()!;
+              const response = await evaluate(form.source);
+              onOutput(response);
+
+              if (response.Kind !== "SUCCESS") {
+                f.unshift(form);
+                break;
+              }
+
+              v = form.end.line + 1;
+            }
+            setForms(f);
+            setVerifiedLines(v);
+          }}
+          reset={async () => {
+            await reset();
+            setVerifiedLines(0);
+            computeForms();
+          }}
+          offset={scrollOffset}
+        />
+        <div
+          className="read-only-background"
+          style={{
+            background: "#ddd",
+            position: "absolute",
+            left: 40,
+            right: 0,
+            top: -scrollOffset,
+            height: verifiedLines * (editor ? editor.defaultTextHeight() : 0),
+          }}
+        />
+        <CodeMirrorComponent
+          options={{
+            mode: "commonlisp",
+            matchBrackets: true,
+            lineNumbers: true,
+            extraKeys: { "Ctrl-Space": "autocomplete" },
+          }}
+          onBeforeChange={(_editor, _data, value) => {
+            onChange(value);
+          }}
+          onChange={() => {
+            computeForms();
+          }}
+          onScroll={(_editor, value) => {
+            setScrollOffset(value.top);
+          }}
+          editorDidMount={(e) => {
+            setEditor(e);
+            computeForms();
+            e.on("inputRead", (e, c) => {
+              // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/48799
+              if (c.text[0] == "(") (e as any).showHint();
+            });
+          }}
+          value={value}
+        ></CodeMirrorComponent>
+      </div>
+    </div>
+  );
 }
 
 registerAutocomplete();
