@@ -10,3 +10,5 @@
 - [ ] Save/load from Dropbox or Google Drive, depending on how easy that is
 - [x] Tooltips for buttons to better indicate what they do
 - [x] Local autosave
+- [ ] Upgrade to React 18 (or whatever the latest version is)
+- [ ] Upgrade to CodeMirror 6 (or whatever the latest version is)
