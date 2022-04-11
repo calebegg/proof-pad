@@ -57,6 +57,7 @@ export function Tutorial({ onEdit }: { onEdit: () => void }) {
           onClick={() => {
             setPageNum((n) => n - 1);
           }}
+          aria-label="Previous page"
           disabled={pageNum == 0}
         >
           <FontAwesomeIcon icon={faArrowLeft} />
@@ -65,6 +66,7 @@ export function Tutorial({ onEdit }: { onEdit: () => void }) {
           onClick={() => {
             setPageNum((n) => n + 1);
           }}
+          aria-label="Next page"
           disabled={pageNum == PAGES.length - 1}
         >
           <FontAwesomeIcon icon={faArrowRight} />
@@ -73,6 +75,7 @@ export function Tutorial({ onEdit }: { onEdit: () => void }) {
           onClick={() => {
             onEdit();
           }}
+          aria-label="Switch to editor"
         >
           <FontAwesomeIcon icon={faEdit} />
         </button>
