@@ -19,7 +19,7 @@ import { Editor as CodeMirrorEditor, Position, TextMarker } from "codemirror";
 import "codemirror/addon/edit/matchbrackets";
 import "codemirror/addon/hint/show-hint";
 import "codemirror/mode/commonlisp/commonlisp";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controlled as CodeMirrorComponent } from "react-codemirror2";
 import { Acl2Response, evaluate, reset } from "../acl2";
 import { ProofBar } from "./ProofBar";
@@ -51,7 +51,7 @@ export function Editor({
   const [forms, setForms] = useState<Form[]>([]);
   const [scrollOffset, setScrollOffset] = useState(0);
 
-  function computeForms() {
+  useEffect(() => {
     if (!editor) return;
     let nestLevel = 0;
     let forms: Form[] = [];
@@ -83,7 +83,7 @@ export function Editor({
       }
     }
     setForms(forms);
-  }
+  }, [editor, verifiedLines, value]);
 
   return (
     <div id="editor">
@@ -131,7 +131,6 @@ export function Editor({
           reset={async () => {
             await reset();
             setVerifiedLines(0);
-            computeForms();
           }}
           offset={scrollOffset}
         />
@@ -156,15 +155,11 @@ export function Editor({
           onBeforeChange={(_editor, _data, value) => {
             onChange(value);
           }}
-          onChange={() => {
-            computeForms();
-          }}
           onScroll={(_editor, value) => {
             setScrollOffset(value.top);
           }}
           editorDidMount={(e) => {
             setEditor(e);
-            computeForms();
             e.on("inputRead", (e, c) => {
               // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/48799
               if (c.text[0] == "(") (e as any).showHint();
