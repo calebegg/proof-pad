@@ -8,5 +8,5 @@
 - [ ] Change ":doc foo" to a link to the ACL2 documentation when it's shown in
       output
 - [ ] Save/load from Dropbox or Google Drive, depending on how easy that is
-- [ ] Tooltips for buttons to better indicate what they do
+- [x] Tooltips for buttons to better indicate what they do
 - [x] Local autosave
