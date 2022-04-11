@@ -58,15 +58,21 @@ button {
   cursor: pointer;
 }
 
-#container {
+main {
   display: flex;
   flex-direction: row;
   align-items: stretch;
   height: 100vh;
 }
 
-#container > :first-child,
-#container > :last-child {
+@media (orientation: portrait) {
+  main {
+    flex-direction: column;
+  }
+}
+
+main > :first-child,
+main > :last-child {
   flex: 1;
   background: white;
 }
