@@ -1,7 +1,7 @@
 import React from "react";
 import { setInputCode } from "../terminal/InputField";
 
-export function ClickablePre({ children }: { children: any }) {
+export function ClickablePre({ children }: { children: React.ReactElement }) {
   return (
     <pre className="clickable">
       <code

@@ -90,7 +90,7 @@ export class Terminal extends React.Component<
             <div
               className={[
                 "log",
-                entry.output.kind == LogKind.ERROR ? "error" : "",
+                entry.output.kind === LogKind.ERROR ? "error" : "",
               ].join(" ")}
               key={i}
             >

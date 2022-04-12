@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import React, { useState, useRef, useLayoutEffect, useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { LogKind } from "../LogKind";
 
 const KIND_TO_SYMBOL = new Map([
@@ -51,7 +51,7 @@ export function LogEntry({ kind, value }: { kind: LogKind; value?: string }) {
     );
   }
   return (
-    <pre ref={measure} className={kind == LogKind.ERROR ? "error" : ""}>
+    <pre ref={measure} className={kind === LogKind.ERROR ? "error" : ""}>
       <div
         style={{
           overflow: "hidden",

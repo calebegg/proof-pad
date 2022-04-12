@@ -20,8 +20,12 @@ export interface Acl2Response {
   Body: string;
 }
 
-let ws: WebSocket;
-let queue: Array<[(v: Acl2Response) => void, (v: {}) => void]>;
+const ws = new WebSocket(`ws:35.227.97.92/acl2`);
+
+ws.addEventListener("message", onUpdate);
+ws.addEventListener("close", onUpdate);
+
+const queue: Array<[(v: Acl2Response) => void, (v: {}) => void]> = [];
 let unhandledErrorCallback: (e: string) => void = defaultCallback;
 
 export async function reset() {
@@ -31,11 +35,6 @@ export async function reset() {
     unhandledErrorCallback(r);
   }
 }
-
-ws = new WebSocket(`ws:35.227.97.92/acl2`);
-ws.addEventListener("message", onUpdate);
-ws.addEventListener("close", onUpdate);
-queue = [];
 
 function defaultCallback(e: {}) {
   console.warn("No handler for", e);
@@ -54,7 +53,7 @@ function onUpdate(e: Event) {
     case "message":
       resolver(JSON.parse((e as MessageEvent).data));
       break;
-    case "close":
+    case "close": {
       const closeEvent = e as CloseEvent;
       if (!closeEvent.wasClean) {
         rejecter(`Socket closed unexpectedly. Error code ${closeEvent.code}.`);
@@ -62,6 +61,7 @@ function onUpdate(e: Event) {
         resolver({ Kind: "ERROR", Body: "Socket closed." });
       }
       break;
+    }
     default:
       throw new Error(`Unexpected event type: ${e.type}`);
   }

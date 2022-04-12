@@ -58,7 +58,7 @@ export function Tutorial({ onEdit }: { onEdit: () => void }) {
             setPageNum((n) => n - 1);
           }}
           aria-label="Previous page"
-          disabled={pageNum == 0}
+          disabled={pageNum === 0}
         >
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
@@ -67,7 +67,7 @@ export function Tutorial({ onEdit }: { onEdit: () => void }) {
             setPageNum((n) => n + 1);
           }}
           aria-label="Next page"
-          disabled={pageNum == PAGES.length - 1}
+          disabled={pageNum === PAGES.length - 1}
         >
           <FontAwesomeIcon icon={faArrowRight} />
         </button>

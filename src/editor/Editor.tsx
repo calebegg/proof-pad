@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { Editor as CodeMirrorEditor, Position, TextMarker } from "codemirror";
+import { Editor as CodeMirrorEditor, Position } from "codemirror";
 import "codemirror/addon/edit/matchbrackets";
 import "codemirror/addon/hint/show-hint";
 import "codemirror/mode/commonlisp/commonlisp";
@@ -23,8 +23,8 @@ import React, { useEffect, useState } from "react";
 import { Controlled as CodeMirrorComponent } from "react-codemirror2";
 import { Acl2Response, evaluate, reset } from "../acl2";
 import { ProofBar } from "./ProofBar";
-import { Toolbar } from "./Toolbar";
 import { registerAutocomplete } from "./register_autocomplete";
+import { Toolbar } from "./Toolbar";
 
 /** A top-level s-expression from the editor */
 export interface Form {
@@ -54,7 +54,7 @@ export function Editor({
   useEffect(() => {
     if (!editor) return;
     let nestLevel = 0;
-    let forms: Form[] = [];
+    const forms: Form[] = [];
     let source = "";
     let startingLine = verifiedLines;
     outer: for (let i = startingLine; i < editor.lastLine() + 1; i++) {
@@ -71,7 +71,7 @@ export function Editor({
           // Bail out because there are un-balanced parens and the rest of this code is going to go south.
           break outer;
         }
-        if (nestLevel == 0) {
+        if (nestLevel === 0) {
           forms.push({
             height: (i - startingLine + 1) * editor.defaultTextHeight(),
             source,
@@ -161,8 +161,7 @@ export function Editor({
           editorDidMount={(e) => {
             setEditor(e);
             e.on("inputRead", (e, c) => {
-              // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/48799
-              if (c.text[0] == "(") (e as any).showHint();
+              if (c.text[0] === "(") e.showHint();
             });
           }}
           value={value}
