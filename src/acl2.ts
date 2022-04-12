@@ -24,10 +24,12 @@ let ws: WebSocket;
 let queue: Array<[(v: Acl2Response) => void, (v: {}) => void]>;
 let unhandledErrorCallback: (e: string) => void = defaultCallback;
 
-export function reset() {
-  evaluate(`:ubu "centaur/bridge/top"`).catch((r) => {
+export async function reset() {
+  try {
+    return evaluate(`:ubu "centaur/bridge/top"`);
+  } catch (r) {
     unhandledErrorCallback(r);
-  });
+  }
 }
 
 ws = new WebSocket(`ws:35.227.97.92/acl2`);
@@ -65,9 +67,9 @@ function onUpdate(e: Event) {
   }
 }
 
-export function evaluate(code: string): Promise<Acl2Response> {
+export async function evaluate(code: string): Promise<Acl2Response> {
   if (ws.readyState !== WebSocket.OPEN) {
-    return Promise.reject("Socket is not open");
+    throw new Error("Socket is not open");
   }
   ws.send(code);
   return new Promise((resolver, rejecter) => queue.push([resolver, rejecter]));
