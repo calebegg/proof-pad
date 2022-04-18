@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-@import url("./node_modules/codemirror/lib/codemirror.css");
 @import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Roboto+Mono:400");
-@import url("./node_modules/codemirror/addon/hint/show-hint.css");
 
 [hidden]:not([hidden="false"]) {
   display: none !important;
@@ -98,15 +96,25 @@ main > :last-child {
   position: relative;
 }
 
-#proofbar {
-  width: 40px;
-  position: relative;
+.proof-bar .cm-gutterElement {
+  cursor: pointer;
+  width: 32px;
 }
 
-#proofbar > .form {
-  box-sizing: border-box;
-  cursor: pointer;
-  text-align: center;
+.proof-bar-form {
+  background: lightcoral;
+}
+
+.proof-bar-proved {
+  background: lightgreen;
+}
+
+.proof-bar:hover .proof-bar-form {
+  background: lightgreen;
+}
+
+.proof-bar:hover .cm-gutterElement:hover ~ .cm-gutterElement .proof-bar-form {
+  background: lightcoral;
 }
 
 input {

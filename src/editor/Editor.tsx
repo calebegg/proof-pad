@@ -15,25 +15,30 @@
  * limitations under the License.
  */
 
-import { Editor as CodeMirrorEditor, Position } from "codemirror";
-import "codemirror/addon/edit/matchbrackets";
-import "codemirror/addon/hint/show-hint";
-import "codemirror/mode/commonlisp/commonlisp";
-import React, { useEffect, useState } from "react";
-import { Controlled as CodeMirrorComponent } from "react-codemirror2";
-import { Acl2Response, evaluate, reset } from "../acl2";
-import { ProofBar } from "./ProofBar";
-import { registerAutocomplete } from "./register_autocomplete";
+import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
+import { closeBrackets, closeBracketsKeymap } from "@codemirror/closebrackets";
+import { defaultKeymap } from "@codemirror/commands";
+import { commentKeymap } from "@codemirror/comment";
+import { lineNumbers } from "@codemirror/gutter";
+import { defaultHighlightStyle } from "@codemirror/highlight";
+import { history, historyKeymap } from "@codemirror/history";
+import { commonLisp } from "@codemirror/legacy-modes/mode/commonlisp";
+import { bracketMatching } from "@codemirror/matchbrackets";
+import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
+import { EditorState } from "@codemirror/state";
+import { StreamLanguage } from "@codemirror/stream-parser";
+import {
+  drawSelection,
+  EditorView,
+  highlightActiveLine,
+  keymap,
+} from "@codemirror/view";
+import React, { useState } from "react";
+import { CodeMirrorLite as CodeMirror } from "react-codemirror6/dist/lite";
+import { Acl2Response } from "../acl2";
+import { autocompletions } from "./autocompletions";
+import { proofBar } from "./proofbar";
 import { Toolbar } from "./Toolbar";
-
-/** A top-level s-expression from the editor */
-export interface Form {
-  /** Pixel height of this form as it is in the editor. */
-  height: number;
-  source: string;
-  /** Position of the end character of the form in the editor */
-  end: Position;
-}
 
 export function Editor({
   value,
@@ -46,129 +51,53 @@ export function Editor({
   onOutput: (response: Acl2Response) => void;
   onEnterTutorial: () => void;
 }) {
-  const [editor, setEditor] = useState<CodeMirrorEditor | null>(null);
-  const [verifiedLines, setVerifiedLines] = useState(0);
-  const [forms, setForms] = useState<Form[]>([]);
-  const [scrollOffset, setScrollOffset] = useState(0);
-
-  useEffect(() => {
-    if (!editor) return;
-    let nestLevel = 0;
-    const forms: Form[] = [];
-    let source = "";
-    let startingLine = verifiedLines;
-    outer: for (let i = startingLine; i < editor.lastLine() + 1; i++) {
-      for (const token of editor.getLineTokens(i)) {
-        if (token.type === "comment") continue;
-        source += token.string;
-        if (!token.type) continue;
-        if (token.string === "(") {
-          nestLevel++;
-        } else if (token.string === ")") {
-          nestLevel--;
-        }
-        if (nestLevel < 0) {
-          // Bail out because there are un-balanced parens and the rest of this code is going to go south.
-          break outer;
-        }
-        if (nestLevel === 0) {
-          forms.push({
-            height: (i - startingLine + 1) * editor.defaultTextHeight(),
-            source,
-            end: { line: i, ch: token.end },
-          });
-          startingLine = i + 1;
-          source = "";
-        }
-      }
-    }
-    setForms(forms);
-  }, [editor, verifiedLines, value]);
+  const [editorView, setEditorView] = useState<EditorView | null>(null);
 
   return (
     <div id="editor">
       <Toolbar
-        editor={editor}
         onEnterTutorial={onEnterTutorial}
         onLoad={(value) => {
           onChange(value);
         }}
         value={value}
+        editorView={editorView}
       />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          flex: 1,
-          position: "relative",
-          height: "100%",
+      <CodeMirror
+        style={{ height: "100%", overflowY: "scroll" }}
+        extensions={[
+          proofBar(onOutput),
+          lineNumbers(),
+          history(),
+          drawSelection(),
+          EditorState.allowMultipleSelections.of(true),
+          defaultHighlightStyle.fallback,
+          bracketMatching(),
+          closeBrackets(),
+          autocompletion({ override: [autocompletions] }),
+          highlightActiveLine(),
+          highlightSelectionMatches(),
+          StreamLanguage.define(commonLisp),
+
+          keymap.of([
+            ...closeBracketsKeymap,
+            ...defaultKeymap,
+            ...searchKeymap,
+            ...historyKeymap,
+            ...commentKeymap,
+            ...completionKeymap,
+          ]),
+        ]}
+        onChange={(value) => {
+          onChange(value);
         }}
-      >
-        <ProofBar
-          forms={forms}
-          verifiedHeight={
-            editor ? verifiedLines * editor!.defaultTextHeight() : 0
-          }
-          advanceTo={async (index) => {
-            if (!editor) return;
-            const f = [...forms];
-            let v = verifiedLines;
-            for (let i = 0; i <= index; i++) {
-              const form = f.shift()!;
-              const response = await evaluate(form.source);
-              onOutput(response);
-
-              if (response.Kind !== "SUCCESS") {
-                f.unshift(form);
-                break;
-              }
-
-              v = form.end.line + 1;
-            }
-            setForms(f);
-            setVerifiedLines(v);
-          }}
-          reset={async () => {
-            await reset();
-            setVerifiedLines(0);
-          }}
-          offset={scrollOffset}
-        />
-        <div
-          className="read-only-background"
-          style={{
-            background: "#ddd",
-            position: "absolute",
-            left: 40,
-            right: 0,
-            top: -scrollOffset,
-            height: verifiedLines * (editor ? editor.defaultTextHeight() : 0),
-          }}
-        />
-        <CodeMirrorComponent
-          options={{
-            mode: "commonlisp",
-            matchBrackets: true,
-            lineNumbers: true,
-            extraKeys: { "Ctrl-Space": "autocomplete" },
-          }}
-          onBeforeChange={(_editor, _data, value) => {
-            onChange(value);
-          }}
-          onScroll={(_editor, value) => {
-            setScrollOffset(value.top);
-          }}
-          editorDidMount={(e) => {
-            setEditor(e);
-            e.on("inputRead", (e, c) => {
-              if (c.text[0] === "(") e.showHint();
-            });
-          }}
-          value={value}
-        ></CodeMirrorComponent>
-      </div>
+        onViewChange={(view) => {
+          setEditorView(view);
+        }}
+        value={value}
+      ></CodeMirror>
     </div>
   );
 }
 
-registerAutocomplete();
+// registerAutocomplete();

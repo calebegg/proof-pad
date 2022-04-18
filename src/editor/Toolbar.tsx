@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+import { redo, undo } from "@codemirror/history";
+import { EditorView } from "@codemirror/view";
 import {
   faQuestionCircle,
   faRedo,
@@ -24,15 +26,14 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useRef } from "react";
-import { Editor as CodeMirrorEditor } from "codemirror";
 
 export function Toolbar({
-  editor,
+  editorView,
   onEnterTutorial,
   onLoad,
   value,
 }: {
-  editor: CodeMirrorEditor | null;
+  editorView: EditorView | null;
   onEnterTutorial: () => void;
   onLoad: (value: string) => void;
   value: string;
@@ -81,7 +82,7 @@ export function Toolbar({
       <button
         aria-label="Undo"
         onClick={() => {
-          if (editor) editor.execCommand("undo");
+          if (editorView) undo(editorView);
         }}
       >
         <FontAwesomeIcon icon={faUndo} />
@@ -89,7 +90,7 @@ export function Toolbar({
       <button
         aria-label="Redo"
         onClick={() => {
-          if (editor) editor.execCommand("redo");
+          if (editorView) redo(editorView);
         }}
       >
         <FontAwesomeIcon icon={faRedo} />
