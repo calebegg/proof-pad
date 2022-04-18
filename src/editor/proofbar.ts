@@ -18,7 +18,6 @@
 import { gutter, GutterMarker } from "@codemirror/gutter";
 import { syntaxTree } from "@codemirror/language";
 import { EditorView } from "@codemirror/view";
-import { dom } from "@fortawesome/fontawesome-svg-core";
 import { Acl2Response, evaluate } from "../acl2";
 
 class FormMarker extends GutterMarker {
