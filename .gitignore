@@ -7,3 +7,4 @@ gin-bin
 .cache/*
 .firebase/*
 .parcel-cache/*
+grammar/*

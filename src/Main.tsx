@@ -19,7 +19,7 @@ import React, { useState } from "react";
 import { Editor } from "./editor/Editor";
 import { LogKind } from "./LogKind";
 import { Terminal } from "./terminal/Terminal";
-import { Acl2Response } from "./acl2";
+import { Acl2Response } from "./acl2_driver";
 import { Tutorial } from "./tutorial/Tutorial";
 
 export function Main() {

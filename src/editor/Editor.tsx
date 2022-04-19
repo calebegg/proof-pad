@@ -22,11 +22,9 @@ import { commentKeymap } from "@codemirror/comment";
 import { lineNumbers } from "@codemirror/gutter";
 import { defaultHighlightStyle } from "@codemirror/highlight";
 import { history, historyKeymap } from "@codemirror/history";
-import { commonLisp } from "@codemirror/legacy-modes/mode/commonlisp";
 import { bracketMatching } from "@codemirror/matchbrackets";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
 import { EditorState } from "@codemirror/state";
-import { StreamLanguage } from "@codemirror/stream-parser";
 import {
   drawSelection,
   EditorView,
@@ -35,8 +33,9 @@ import {
 } from "@codemirror/view";
 import React, { useState } from "react";
 import { CodeMirrorLite as CodeMirror } from "react-codemirror6/dist/lite";
-import { Acl2Response } from "../acl2";
+import { Acl2Response } from "../acl2_driver";
 import { autocompletions } from "./autocompletions";
+import { acl2 } from "./acl2_language";
 import { proofBar } from "./proofbar";
 import { Toolbar } from "./Toolbar";
 
@@ -77,7 +76,7 @@ export function Editor({
           autocompletion({ override: [autocompletions] }),
           highlightActiveLine(),
           highlightSelectionMatches(),
-          StreamLanguage.define(commonLisp),
+          acl2(),
 
           keymap.of([
             ...closeBracketsKeymap,
@@ -99,5 +98,3 @@ export function Editor({
     </div>
   );
 }
-
-// registerAutocomplete();

@@ -18,7 +18,7 @@
 import { gutter, GutterMarker } from "@codemirror/gutter";
 import { syntaxTree } from "@codemirror/language";
 import { EditorView } from "@codemirror/view";
-import { Acl2Response, evaluate } from "../acl2";
+import { Acl2Response, evaluate } from "../acl2_driver";
 
 class FormMarker extends GutterMarker {
   constructor(

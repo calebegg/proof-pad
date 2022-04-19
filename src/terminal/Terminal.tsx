@@ -16,7 +16,11 @@
  */
 
 import React from "react";
-import { evaluate, listenForUnhandledError, Acl2Response } from "../acl2";
+import {
+  evaluate,
+  listenForUnhandledError,
+  Acl2Response,
+} from "../acl2_driver";
 import { LogKind } from "../LogKind";
 import { InputField } from "./InputField";
 import { LogEntry } from "./LogEntry";

@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@lezer/generator": "^0.15.4",
     "@mdx-js/mdx": "^2.1.1",
     "@parcel/transformer-mdx": "^2.4.1",
     "@types/mdx-js__react": "^1.5.3",
@@ -8,6 +9,7 @@
     "@types/react-dom": "^16.9.8",
     "gts": "^3.1.0",
     "parcel": "^2.0.0-nightly.425",
+    "process": "^0.11.10",
     "typescript": "^4.0.3"
   },
   "dependencies": {
@@ -29,7 +31,9 @@
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@fortawesome/react-fontawesome": "^0.1.11",
     "@lezer/common": "^0.15.12",
+    "@lezer/lr": "^0.15.8",
     "@mdx-js/react": "^1.6.22",
+    "lezer": "^0.13.5",
     "react": "^18.0.0",
     "react-codemirror6": "^1.1.0",
     "react-dom": "^17.0.2"

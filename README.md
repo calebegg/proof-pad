@@ -10,7 +10,7 @@ This is not an official Google product.
 
 ## Deploying the frontend
 
-1. Run `rm -r dist && npx parcel build index.html`
+1. Run `rm -r dist grammar && ./grammar.sh && npx parcel build index.html`
 1. Copy the contents of dist
    [to Google Cloud Storage](https://console.cloud.google.com/storage/browser/new.proofpad.org?project=proof-pad)
 

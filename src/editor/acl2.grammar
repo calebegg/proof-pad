@@ -1,0 +1,26 @@
+@top Program { expression* }
+
+expression {
+  Identifier |
+  String |
+  Symbol |
+  Application { "(" expression* ")" }
+}
+
+@tokens {
+  Identifier { $[a-zA-Z0-9:&-]+ }
+
+  String { '"' (!["\\] | "\\" _)* '"' }
+
+  LineComment { ";" ![\n]* }
+
+  Symbol { "'" $[a-zA-Z0-9:&-]+ }
+
+  space { $[ \t\n\r]+ }
+
+  "(" ")"
+}
+
+@skip { space | LineComment }
+
+@detectDelim

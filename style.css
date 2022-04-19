@@ -101,8 +101,20 @@ main > :last-child {
   width: 32px;
 }
 
-.proof-bar-form {
-  background: lightcoral;
+.proof-bar .cm-gutterElement:nth-child(2) {
+  /* Hide the tiny piece of margin that is added to the first block */
+  margin-top: 0 !important;
+}
+
+.proof-bar {
+  background: repeating-linear-gradient(
+      45deg,
+      white,
+      white 5px,
+      lightgray 5px,
+      lightgray 10px
+    )
+    fixed;
 }
 
 .proof-bar-proved {
@@ -114,7 +126,7 @@ main > :last-child {
 }
 
 .proof-bar:hover .cm-gutterElement:hover ~ .cm-gutterElement .proof-bar-form {
-  background: lightcoral;
+  background: transparent;
 }
 
 input {
