@@ -1,4 +1,3 @@
-import { styleTags, tags } from "@codemirror/highlight";
 import { indentNodeProp } from "@codemirror/language";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -6,6 +5,7 @@ import { parser } from "../../grammar/acl2";
 import { LRLanguage } from "@codemirror/language";
 import { completeFromList } from "@codemirror/autocomplete";
 import { LanguageSupport } from "@codemirror/language";
+import { styleTags, tags } from "@lezer/highlight";
 
 const acl2Language = LRLanguage.define({
   parser: parser.configure({

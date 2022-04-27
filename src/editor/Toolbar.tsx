@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { redo, undo } from "@codemirror/history";
+import { redo, undo } from "@codemirror/commands";
 import { EditorView } from "@codemirror/view";
 import {
   faQuestionCircle,
@@ -65,14 +65,12 @@ export function Toolbar({
         onClick={() => {
           inputRef.current!.click(); // Activates the hidden file input.
           const changeHandler = () => {
-            const reader = new FileReader();
-            reader.readAsText(inputRef.current!.files![0]);
-            reader.addEventListener("load", () => {
-              onLoad(reader.result as string);
-              inputRef.current!.removeEventListener("change", changeHandler);
+            inputRef.current!.files![0].text().then((f) => {
+              onLoad(f);
             });
             // Ensures change event triggered if same file uploaded twice.
             inputRef.current!.value = "";
+            inputRef.current!.removeEventListener("change", changeHandler);
           };
           inputRef.current!.addEventListener("change", changeHandler);
         }}

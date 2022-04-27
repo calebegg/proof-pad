@@ -23,10 +23,6 @@ import { Acl2Response } from "./acl2_driver";
 import { Tutorial } from "./tutorial/Tutorial";
 
 export function Main() {
-  const [editorValue, setEditorValue] = useState(
-    () => localStorage.getItem("autosave") || "",
-  );
-
   const [showTutorial, setShowTutorial] = useState(false);
 
   const [log, setLog] = useState<
@@ -73,11 +69,6 @@ export function Main() {
         />
       ) : (
         <Editor
-          onChange={(v) => {
-            setEditorValue(v);
-            localStorage.setItem("autosave", v);
-          }}
-          value={editorValue}
           onOutput={(r) => {
             updateLog(r);
           }}
