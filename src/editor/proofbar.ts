@@ -17,7 +17,13 @@
 import { Acl2Response, evaluate } from "../acl2_driver";
 import { syntaxTree } from "@codemirror/language";
 import { EditorState, RangeSet } from "@codemirror/state";
-import { gutter, GutterMarker, ViewPlugin, ViewUpdate } from "@codemirror/view";
+import {
+  Decoration,
+  gutter,
+  GutterMarker,
+  ViewPlugin,
+  ViewUpdate,
+} from "@codemirror/view";
 
 let forms: Array<{
   start: number;
@@ -26,10 +32,15 @@ let forms: Array<{
   from: number;
 }> = [];
 
+let provedThrough = -1;
+
 let oldDoc = "";
 
 class FormMarker extends GutterMarker {
-  constructor(private readonly index: number) {
+  constructor(
+    private readonly onOutput: (response: Acl2Response) => void,
+    private readonly index: number,
+  ) {
     super();
   }
   toDOM() {
@@ -39,11 +50,19 @@ class FormMarker extends GutterMarker {
     div.style.height =
       this.index === -1 ? "0" : forms[this.index].lines + "00%";
     div.addEventListener("click", async () => {
-      this.onOutput(await evaluate(this.source));
+      for (; provedThrough < this.index; provedThrough++) {
+        const response = await evaluate(forms[provedThrough + 1].source);
+        this.onOutput(response);
+        if (response.Kind === "ERROR") break;
+      }
     });
     return div;
   }
 }
+
+const readonly = Decoration.mark({
+  attributes: { class: "read-only" },
+});
 
 export function proofBar(onOutput: (response: Acl2Response) => void) {
   return [
@@ -82,14 +101,14 @@ export function proofBar(onOutput: (response: Acl2Response) => void) {
     ),
     EditorState.changeFilter.of(() => {
       // TODO(calebegg): Mark parts of the document readonly
-      return [0, 0];
+      return [0, forms[provedThrough + 1].from];
     }),
     gutter({
       class: "proof-bar",
-      initialSpacer: () => new FormMarker(-1),
+      initialSpacer: () => new FormMarker(onOutput, -1),
       markers: () => {
         return RangeSet.of(
-          forms.map((f, i) => new FormMarker(i).range(f.from)),
+          forms.map((f, i) => new FormMarker(onOutput, i).range(f.from)),
         );
       },
     }),
