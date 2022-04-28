@@ -124,6 +124,10 @@ main > :last-child {
   background: lightgreen;
 }
 
+.proof-bar-error {
+  background: lightpink;
+}
+
 .proof-bar:hover .proof-bar-form {
   background: lightgreen;
 }

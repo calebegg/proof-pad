@@ -17,13 +17,7 @@
 import { Acl2Response, evaluate } from "../acl2_driver";
 import { syntaxTree } from "@codemirror/language";
 import { EditorState, RangeSet } from "@codemirror/state";
-import {
-  Decoration,
-  gutter,
-  GutterMarker,
-  ViewPlugin,
-  ViewUpdate,
-} from "@codemirror/view";
+import { gutter, GutterMarker, ViewPlugin, ViewUpdate } from "@codemirror/view";
 
 let forms: Array<{
   start: number;
@@ -31,6 +25,8 @@ let forms: Array<{
   source: string;
   from: number;
 }> = [];
+
+const domNodes: HTMLDivElement[] = [];
 
 let provedThrough = -1;
 
@@ -45,7 +41,8 @@ class FormMarker extends GutterMarker {
   }
   toDOM() {
     const div = document.createElement("div");
-    div.className = "proof-bar-form";
+    div.classList.add("proof-bar-form");
+    if (this.index <= provedThrough) div.classList.add("proof-bar-proved");
     div.style.width = "100%";
     div.style.height =
       this.index === -1 ? "0" : forms[this.index].lines + "00%";
@@ -53,16 +50,17 @@ class FormMarker extends GutterMarker {
       for (; provedThrough < this.index; provedThrough++) {
         const response = await evaluate(forms[provedThrough + 1].source);
         this.onOutput(response);
-        if (response.Kind === "ERROR") break;
+        if (response.Kind === "ERROR") {
+          domNodes[provedThrough + 1].classList.add("proof-bar-error");
+          break;
+        }
+        domNodes[provedThrough + 1].classList.add("proof-bar-proved");
       }
     });
+    domNodes[this.index] = div;
     return div;
   }
 }
-
-const readonly = Decoration.mark({
-  attributes: { class: "read-only" },
-});
 
 export function proofBar(onOutput: (response: Acl2Response) => void) {
   return [
