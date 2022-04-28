@@ -14,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { EditorView } from "@codemirror/view";
-import React, { useState } from "react";
 import { Acl2Response } from "../acl2_driver";
 import { CodeMirror } from "./CodeMirror";
 import { Toolbar } from "./Toolbar";
+import { EditorView } from "@codemirror/view";
+import React, { useState } from "react";
 
 export function Editor({
   onOutput,

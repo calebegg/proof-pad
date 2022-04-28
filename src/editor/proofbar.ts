@@ -14,31 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { syntaxTree } from "@codemirror/language";
-import { EditorView, gutter, GutterMarker } from "@codemirror/view";
 import { Acl2Response, evaluate } from "../acl2_driver";
-import {
-  StateField,
-  StateEffect,
-  RangeSet,
-  EditorState,
-} from "@codemirror/state";
+import { syntaxTree } from "@codemirror/language";
+import { EditorState, RangeSet } from "@codemirror/state";
+import { gutter, GutterMarker, ViewPlugin, ViewUpdate } from "@codemirror/view";
+
+let forms: Array<{
+  start: number;
+  lines: number;
+  source: string;
+  from: number;
+}> = [];
+
+let oldDoc = "";
 
 class FormMarker extends GutterMarker {
-  constructor(
-    private readonly onOutput: (response: Acl2Response) => void,
-    private readonly height: number,
-    private readonly source: string,
-  ) {
+  constructor(private readonly index: number) {
     super();
   }
-
   toDOM() {
     const div = document.createElement("div");
     div.className = "proof-bar-form";
     div.style.width = "100%";
-    div.style.height = this.height + "00%";
+    div.style.height =
+      this.index === -1 ? "0" : forms[this.index].lines + "00%";
     div.addEventListener("click", async () => {
       this.onOutput(await evaluate(this.source));
     });
@@ -48,27 +47,51 @@ class FormMarker extends GutterMarker {
 
 export function proofBar(onOutput: (response: Acl2Response) => void) {
   return [
+    ViewPlugin.fromClass(
+      class {
+        update(vu: ViewUpdate) {
+          const doc = vu.state.doc.toString();
+          // Avoid unnecessary recalculations
+          if (doc === oldDoc) return;
+          oldDoc = doc;
+          forms = [];
+          const tree = syntaxTree(vu.state).cursor();
+          // Enter 'Program'
+          if (!tree.firstChild()) {
+            return [0, 0];
+          }
+          let from = 0;
+          let start = 1;
+          do {
+            if (tree.name !== "Application") continue;
+            const source = vu.state.sliceDoc(from, tree.to);
+            const lines =
+              [...source].filter((c) => c === "\n").length +
+              (from === 0 ? 1 : 0);
+            forms.push({
+              start,
+              from: from === 0 ? 0 : from + 1,
+              lines,
+              source,
+            });
+            from = tree.to;
+            start += lines;
+          } while (tree.nextSibling());
+        }
+      },
+    ),
     EditorState.changeFilter.of(() => {
       // TODO(calebegg): Mark parts of the document readonly
       return [0, 0];
     }),
     gutter({
       class: "proof-bar",
-      initialSpacer: () => new FormMarker(onOutput, 0, ""),
+      initialSpacer: () => new FormMarker(-1),
+      markers: () => {
+        return RangeSet.of(
+          forms.map((f, i) => new FormMarker(i).range(f.from)),
+        );
+      },
     }),
   ];
 }
-
-const proofBarState = StateField.define<RangeSet<GutterMarker>>({
-  create() {
-    return RangeSet.empty;
-  },
-  update(set, transaction) {
-    set = set.map(transaction.changes);
-    console.log(transaction);
-    for (let e of transaction.effects) {
-      console.log(e);
-    }
-    return set;
-  },
-});
