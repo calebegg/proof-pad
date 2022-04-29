@@ -1,11 +1,14 @@
 @top Program { expression* }
 
 expression {
+  Keyword |
   Identifier |
   String |
   Symbol |
   Application { "(" expression* ")" }
 }
+
+Keyword { @specialize<Identifier, "defun" | "defthm" | "if" | "cond"> }
 
 @tokens {
   Identifier { $[a-zA-Z0-9:&-]+ }
