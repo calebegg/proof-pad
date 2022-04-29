@@ -14,16 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { CompletionContext } from "@codemirror/autocomplete";
 
 export function autocompletions(context: CompletionContext) {
-  console.log("hi");
-  const signal = context.matchBefore(/\(/);
+  const signal = context.matchBefore(/\(\w*/);
   if (!signal && !context.explicit) return null;
   return {
     from: signal?.from || context.pos,
-    options: AUTOCOMPLETIONS.map((w) => ({ label: w, type: "keyword" })),
+    options: AUTOCOMPLETIONS.map((w) => ({ label: "(" + w, type: "keyword" })),
   };
 }
 
