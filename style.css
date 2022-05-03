@@ -121,18 +121,21 @@ main > :last-child {
 }
 
 .proof-bar-proved {
-  background: lightgreen;
+  background: green;
 }
 
 .proof-bar-error {
   background: lightpink;
 }
 
-.proof-bar:hover .proof-bar-form {
+.proof-bar:hover .proof-bar-form:not(.proof-bar-proved) {
   background: lightgreen;
 }
 
-.proof-bar:hover .cm-gutterElement:hover ~ .cm-gutterElement .proof-bar-form {
+.proof-bar:hover
+  .cm-gutterElement:hover
+  ~ .cm-gutterElement
+  .proof-bar-form:not(.proof-bar-proved) {
   background: transparent;
 }
 

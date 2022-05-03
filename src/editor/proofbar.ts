@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Acl2Response, evaluate } from "../acl2_driver";
+import { Acl2Response, evaluate, reset } from "../acl2_driver";
 import { syntaxTree } from "@codemirror/language";
 import { EditorState, RangeSet } from "@codemirror/state";
 import { gutter, GutterMarker, ViewPlugin, ViewUpdate } from "@codemirror/view";
@@ -47,6 +47,14 @@ class FormMarker extends GutterMarker {
     div.style.height =
       this.index === -1 ? "0" : forms[this.index].lines + "00%";
     div.addEventListener("click", async () => {
+      console.log(provedThrough);
+      if (provedThrough >= this.index) {
+        await reset();
+        for (; provedThrough > -1; provedThrough--) {
+          domNodes[provedThrough].classList.remove("proof-bar-proved");
+        }
+        return;
+      }
       for (; provedThrough < this.index; provedThrough++) {
         const response = await evaluate(forms[provedThrough + 1].source);
         this.onOutput(response);
