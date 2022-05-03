@@ -22,7 +22,7 @@ export function autocompletions(context: CompletionContext) {
   const signal = context.matchBefore(/\(/);
   if (!signal && !context.explicit) return null;
   return {
-    from: signal?.from || context.pos,
+    from: signal ? signal.from : context.pos,
     options: AUTOCOMPLETIONS.map((w) => ({ label: w, type: "keyword" })),
   };
 }
