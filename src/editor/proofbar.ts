@@ -24,6 +24,7 @@ let forms: Array<{
   lines: number;
   source: string;
   from: number;
+  to: number;
 }> = [];
 
 const domNodes: HTMLDivElement[] = [];
@@ -47,7 +48,6 @@ class FormMarker extends GutterMarker {
     div.style.height =
       this.index === -1 ? "0" : forms[this.index].lines + "00%";
     div.addEventListener("click", async () => {
-      console.log(provedThrough);
       if (provedThrough >= this.index) {
         await reset();
         for (; provedThrough > -1; provedThrough--) {
@@ -96,6 +96,7 @@ export function proofBar(onOutput: (response: Acl2Response) => void) {
             forms.push({
               start,
               from: from === 0 ? 0 : from + 1,
+              to: tree.to,
               lines,
               source,
             });
@@ -106,8 +107,7 @@ export function proofBar(onOutput: (response: Acl2Response) => void) {
       },
     ),
     EditorState.changeFilter.of(() => {
-      // TODO(calebegg): Mark parts of the document readonly
-      return [0, forms[provedThrough + 1].from];
+      return [0, forms[provedThrough + 1]?.from ?? forms[provedThrough].to];
     }),
     gutter({
       class: "proof-bar",
