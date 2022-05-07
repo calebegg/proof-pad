@@ -84,7 +84,7 @@ class FormMarker extends GutterMarker {
     div.style.width = "100%";
     div.style.height =
       this.index === -1 ? "0" : forms[this.index].lines + "00%";
-    div.addEventListener("click", async () => {
+    const handler = async () => {
       if (provedThrough < this.index) {
         view.dispatch({
           effects: REQUEST_TO_PROVE.of(
@@ -94,7 +94,9 @@ class FormMarker extends GutterMarker {
       } else {
         view.dispatch({ effects: RESET.of(null) });
       }
-    });
+    };
+    // Can't use 'click' because it gets eaten by codemirror
+    div.addEventListener("mouseup", handler);
     return div;
   }
 }
