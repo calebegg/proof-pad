@@ -68,10 +68,7 @@ const PROOF_ERROR = StateEffect.define<Acl2Response>();
 const RESET = StateEffect.define();
 
 class FormMarker extends GutterMarker {
-  constructor(
-    private readonly onOutput: (response: Acl2Response) => void,
-    private readonly index: number,
-  ) {
+  constructor(private readonly index: number) {
     super();
   }
   toDOM(view: EditorView) {
@@ -189,10 +186,9 @@ export function proofBar(onOutput: (response: Acl2Response) => void) {
     }),
     gutter({
       class: "proof-bar",
-      initialSpacer: () => new FormMarker(onOutput, -1),
-      markers: (view) => {
+      markers: () => {
         return RangeSet.of(
-          forms.map((f, i) => new FormMarker(onOutput, i).range(f.from)),
+          forms.map((f, i) => new FormMarker(i).range(f.from)),
         );
       },
     }),
