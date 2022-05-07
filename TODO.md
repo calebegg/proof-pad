@@ -17,4 +17,4 @@
 - [ ] Icons in proof bar
 - [ ] Arrow in proof bar
 - [ ] Diagnose proof bar clicks getting lost
-- [ ] Support ctrl+S
+- [x] Support ctrl+S
