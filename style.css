@@ -109,14 +109,11 @@ main > :last-child {
 }
 
 .proof-bar {
-  background: repeating-linear-gradient(
-      45deg,
-      white,
-      white 5px,
-      lightgray 5px,
-      lightgray 10px
-    )
-    fixed;
+  background: lightgray;
+}
+
+.proof-bar-form {
+  position: relative;
 }
 
 .proof-bar-proved {
@@ -131,10 +128,24 @@ main > :last-child {
   background: lightgreen;
 }
 
+.proof-bar:hover .proof-bar-form:not(.proof-bar-proved)::after {
+  content: "";
+  background: lightgreen;
+  width: 32px;
+  height: 32px;
+  position: absolute;
+  top: calc(100% - 16px);
+  transform: scaleY(0.5) rotate(45deg);
+}
+
 .proof-bar:hover
   .cm-gutterElement:hover
   ~ .cm-gutterElement
-  .proof-bar-form:not(.proof-bar-proved) {
+  .proof-bar-form:not(.proof-bar-proved),
+.proof-bar:hover
+  .cm-gutterElement:hover
+  ~ .cm-gutterElement
+  .proof-bar-form:not(.proof-bar-proved)::after {
   background: transparent;
 }
 
