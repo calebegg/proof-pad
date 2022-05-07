@@ -48,7 +48,6 @@ export function CodeMirror({
       doc: initialValue,
       extensions: [
         proofBar(onOutput),
-        lineNumbers(),
         history(),
         drawSelection(),
         EditorState.allowMultipleSelections.of(true),
