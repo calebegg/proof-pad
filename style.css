@@ -104,9 +104,8 @@ main > :last-child {
   cursor: pointer;
 }
 
-.proof-bar .cm-gutterElement:nth-child(2) {
-  /* Hide the tiny piece of margin that is added to the first block */
-  margin-top: 0 !important;
+.cm-content {
+  padding: 0 !important;
 }
 
 .proof-bar {
@@ -137,6 +136,11 @@ main > :last-child {
   ~ .cm-gutterElement
   .proof-bar-form:not(.proof-bar-proved) {
   background: transparent;
+}
+
+.read-only {
+  /* Override cm-currentLine */
+  background: lightgray !important;
 }
 
 input {

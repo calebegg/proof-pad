@@ -11,5 +11,5 @@
 - [x] Tooltips for buttons to better indicate what they do
 - [x] Local autosave
 - [ ] Upgrade to React 18 (or whatever the latest version is)
-- [ ] Upgrade to CodeMirror 6 (or whatever the latest version is)
+- [x] Upgrade to CodeMirror 6 (or whatever the latest version is)
 - [ ] Support ctrl+S

@@ -16,22 +16,56 @@
  */
 import { Acl2Response, evaluate, reset } from "../acl2_driver";
 import { syntaxTree } from "@codemirror/language";
-import { EditorState, RangeSet } from "@codemirror/state";
-import { gutter, GutterMarker, ViewPlugin, ViewUpdate } from "@codemirror/view";
+import {
+  EditorState,
+  RangeSet,
+  StateEffect,
+  StateField,
+  TransactionSpec,
+} from "@codemirror/state";
+import {
+  gutter,
+  GutterMarker,
+  ViewPlugin,
+  ViewUpdate,
+  Decoration,
+  EditorView,
+} from "@codemirror/view";
 
-let forms: Array<{
+/** Data about top level admitable form in the document */
+interface Form {
+  /** Starting line of this form */
   start: number;
+  /** Lines in this form */
   lines: number;
+  /** Indices of line breaks in the document related to this Form */
+  lineBreaks: number[];
+  /** Source code of this form */
   source: string;
+  /** Starting index for this form in the document */
   from: number;
+  /** Ending index for this form in the document */
   to: number;
-}> = [];
+}
 
-const domNodes: HTMLDivElement[] = [];
+let forms: Form[] = [];
 
-let provedThrough = -1;
+const PROVED_THROUGH = StateField.define<number>({
+  create() {
+    return -1;
+  },
+  update(v, t) {
+    if (t.effects.some((e) => e.is(RESET))) return -1;
+    return v + t.effects.filter((e) => e.is(NEW_FORM_PROVEN)).length;
+  },
+});
 
 let oldDoc = "";
+
+const REQUEST_TO_PROVE = StateEffect.define<Form[]>();
+const NEW_FORM_PROVEN = StateEffect.define<Acl2Response>();
+const PROOF_ERROR = StateEffect.define<Acl2Response>();
+const RESET = StateEffect.define();
 
 class FormMarker extends GutterMarker {
   constructor(
@@ -40,41 +74,67 @@ class FormMarker extends GutterMarker {
   ) {
     super();
   }
-  toDOM() {
+  toDOM(view: EditorView) {
     const div = document.createElement("div");
+    const provedThrough = view.state.field(PROVED_THROUGH);
     div.classList.add("proof-bar-form");
-    if (this.index <= provedThrough) div.classList.add("proof-bar-proved");
+    if (this.index <= provedThrough) {
+      div.classList.add("proof-bar-proved");
+    }
     div.style.width = "100%";
     div.style.height =
       this.index === -1 ? "0" : forms[this.index].lines + "00%";
     div.addEventListener("click", async () => {
-      if (provedThrough >= this.index) {
-        await reset();
-        for (; provedThrough > -1; provedThrough--) {
-          domNodes[provedThrough].classList.remove("proof-bar-proved");
-        }
-        return;
-      }
-      for (; provedThrough < this.index; provedThrough++) {
-        const response = await evaluate(forms[provedThrough + 1].source);
-        this.onOutput(response);
-        if (response.Kind === "ERROR") {
-          domNodes[provedThrough + 1].classList.add("proof-bar-error");
-          break;
-        }
-        domNodes[provedThrough + 1].classList.add("proof-bar-proved");
+      if (provedThrough < this.index) {
+        view.dispatch({
+          effects: REQUEST_TO_PROVE.of(
+            forms.slice(provedThrough + 1, this.index + 1),
+          ),
+        });
+      } else {
+        view.dispatch({ effects: RESET.of(null) });
       }
     });
-    domNodes[this.index] = div;
     return div;
+  }
+}
+
+const stripe = Decoration.line({
+  attributes: { class: "read-only" },
+});
+
+async function evaluateAll(
+  forms: Form[],
+  dispatch: (...specs: TransactionSpec[]) => void,
+) {
+  for (const f of forms) {
+    const r = await evaluate(f.source);
+    if (r.Kind === "ERROR") {
+      dispatch({ effects: PROOF_ERROR.of(r) });
+      return;
+    } else {
+      dispatch({ effects: NEW_FORM_PROVEN.of(r) });
+    }
   }
 }
 
 export function proofBar(onOutput: (response: Acl2Response) => void) {
   return [
+    PROVED_THROUGH,
     ViewPlugin.fromClass(
       class {
+        provedThrough = -1;
         update(vu: ViewUpdate) {
+          this.provedThrough = vu.view.state.field(PROVED_THROUGH);
+          for (const e of vu.transactions.flatMap((t) => t.effects)) {
+            if (e.is(REQUEST_TO_PROVE)) {
+              evaluateAll(e.value, vu.view.dispatch);
+            } else if (e.is(RESET)) {
+              reset();
+            } else if (e.is(NEW_FORM_PROVEN) || e.is(PROOF_ERROR)) {
+              onOutput(e.value);
+            }
+          }
           const doc = vu.state.doc.toString();
           // Avoid unnecessary recalculations
           if (doc === oldDoc) return;
@@ -90,14 +150,20 @@ export function proofBar(onOutput: (response: Acl2Response) => void) {
           do {
             if (tree.name !== "Application") continue;
             const source = vu.state.sliceDoc(from, tree.to);
-            const lines =
-              [...source].filter((c) => c === "\n").length +
-              (from === 0 ? 1 : 0);
+            let lines = from === 0 ? 1 : 0;
+            let lineBreaks = from === 0 ? [0] : [];
+            for (const [i, c] of [...source].entries()) {
+              if (c === "\n") {
+                lines++;
+                lineBreaks.push(from + i + 1);
+              }
+            }
             forms.push({
               start,
               from: from === 0 ? 0 : from + 1,
               to: tree.to,
               lines,
+              lineBreaks,
               source,
             });
             from = tree.to;
@@ -105,14 +171,24 @@ export function proofBar(onOutput: (response: Acl2Response) => void) {
           } while (tree.nextSibling());
         }
       },
+      {
+        decorations(v) {
+          return RangeSet.of(
+            forms
+              .slice(0, v.provedThrough + 1)
+              .flatMap((f) => f.lineBreaks)
+              .map((l) => stripe.range(l)),
+          );
+        },
+      },
     ),
-    EditorState.changeFilter.of(() => {
-      return [0, forms[provedThrough + 1]?.from ?? forms[provedThrough].to];
+    EditorState.changeFilter.from(PROVED_THROUGH, (value) => {
+      return () => [0, forms[value + 1]?.from ?? forms[value].to];
     }),
     gutter({
       class: "proof-bar",
       initialSpacer: () => new FormMarker(onOutput, -1),
-      markers: () => {
+      markers: (view) => {
         return RangeSet.of(
           forms.map((f, i) => new FormMarker(onOutput, i).range(f.from)),
         );
