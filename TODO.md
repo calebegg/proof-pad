@@ -12,4 +12,9 @@
 - [x] Local autosave
 - [ ] Upgrade to React 18 (or whatever the latest version is)
 - [x] Upgrade to CodeMirror 6 (or whatever the latest version is)
+- [ ] Better indentation
+- [ ] Better showing of proofs in progress
+- [ ] Icons in proof bar
+- [ ] Arrow in proof bar
+- [ ] Diagnose proof bar clicks getting lost
 - [ ] Support ctrl+S
