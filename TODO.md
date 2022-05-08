@@ -18,3 +18,4 @@
 - [ ] Arrow in proof bar
 - [ ] Diagnose proof bar clicks getting lost
 - [x] Support ctrl+S
+- [ ] Handle double clicks
