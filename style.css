@@ -117,16 +117,22 @@ main > :last-child {
   background: green;
 }
 
+.proof-bar-pending {
+  background: gray;
+}
+
 .proof-bar-error {
   background: lightpink;
 }
 
-.proof-bar:hover .proof-bar-form:not(.proof-bar-proved),
-.proof-bar:hover .proof-bar-form:not(.proof-bar-proved)::after {
+.proof-bar:hover .proof-bar-form:not(.proof-bar-proved):not(.proof-bar-pending),
+.proof-bar:hover
+  .proof-bar-form:not(.proof-bar-proved):not(.proof-bar-pending)::after {
   background: lightgreen;
 }
 
-.proof-bar:hover .proof-bar-form:not(.proof-bar-proved)::after {
+.proof-bar:hover
+  .proof-bar-form:not(.proof-bar-proved):not(.proof-bar-pending)::after {
   content: "";
   width: 48px;
   height: 48px;
@@ -138,11 +144,11 @@ main > :last-child {
 .proof-bar:hover
   .cm-gutterElement:hover
   ~ .cm-gutterElement
-  .proof-bar-form:not(.proof-bar-proved),
+  .proof-bar-form:not(.proof-bar-proved):not(.proof-bar-pending),
 .proof-bar:hover
   .cm-gutterElement:hover
   ~ .cm-gutterElement
-  .proof-bar-form:not(.proof-bar-proved)::after {
+  .proof-bar-form:not(.proof-bar-proved):not(.proof-bar-pending)::after {
   background: transparent;
 }
 

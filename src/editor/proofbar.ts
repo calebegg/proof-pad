@@ -24,12 +24,12 @@ import {
   TransactionSpec,
 } from "@codemirror/state";
 import {
+  Decoration,
+  EditorView,
   gutter,
   GutterMarker,
   ViewPlugin,
   ViewUpdate,
-  Decoration,
-  EditorView,
 } from "@codemirror/view";
 
 /** Data about top level admitable form in the document */
@@ -59,6 +59,31 @@ const PROVED_THROUGH = StateField.define<number>({
     return v + t.effects.filter((e) => e.is(NEW_FORM_PROVEN)).length;
   },
 });
+const PENDING = StateField.define<number>({
+  create() {
+    return 0;
+  },
+  update(v, t) {
+    if (t.effects.find((e) => e.is(PROOF_ERROR))) return 0;
+    return (
+      v +
+      t.effects
+        .filter((e) => e.is(REQUEST_TO_PROVE))
+        .map((e) => e.value.length)
+        .reduce((x, y) => x + y, 0) -
+      t.effects.filter((e) => e.is(NEW_FORM_PROVEN)).length
+    );
+  },
+});
+const ERROR = StateField.define<boolean>({
+  create() {
+    return false;
+  },
+  update(v, t) {
+    if (t.docChanged) return false;
+    return v || t.effects.filter((e) => e.is(PROOF_ERROR)).length > 0;
+  },
+});
 
 let oldDoc = "";
 
@@ -74,14 +99,20 @@ class FormMarker extends GutterMarker {
   toDOM(view: EditorView) {
     const div = document.createElement("div");
     const provedThrough = view.state.field(PROVED_THROUGH);
+    const pending = view.state.field(PENDING);
     div.classList.add("proof-bar-form");
     if (this.index <= provedThrough) {
       div.classList.add("proof-bar-proved");
+    } else if (this.index <= provedThrough + pending) {
+      div.classList.add("proof-bar-pending");
+    } else if (this.index === provedThrough + 1 && view.state.field(ERROR)) {
+      div.classList.add("proof-bar-error");
     }
     div.style.width = "100%";
     div.style.height =
       this.index === -1 ? "0" : forms[this.index].lines + "00%";
     const handler = async () => {
+      if (pending > 0) return;
       if (provedThrough < this.index) {
         view.dispatch({
           effects: REQUEST_TO_PROVE.of(
@@ -120,6 +151,8 @@ async function evaluateAll(
 export function proofBar(onOutput: (response: Acl2Response) => void) {
   return [
     PROVED_THROUGH,
+    PENDING,
+    ERROR,
     ViewPlugin.fromClass(
       class {
         provedThrough = -1;
@@ -150,7 +183,7 @@ export function proofBar(onOutput: (response: Acl2Response) => void) {
             if (tree.name !== "Application") continue;
             const source = vu.state.sliceDoc(from, tree.to);
             let lines = from === 0 ? 1 : 0;
-            let lineBreaks = from === 0 ? [0] : [];
+            const lineBreaks = from === 0 ? [0] : [];
             for (const [i, c] of [...source].entries()) {
               if (c === "\n") {
                 lines++;
