@@ -96,44 +96,59 @@ main > :last-child {
   position: relative;
 }
 
-.proof-bar {
-  width: 32px;
-}
-
 .proof-bar .cm-gutterElement {
   cursor: pointer;
 }
 
-.proof-bar .cm-gutterElement:nth-child(2) {
-  /* Hide the tiny piece of margin that is added to the first block */
-  margin-top: 0 !important;
+.cm-content {
+  padding: 0 !important;
 }
 
 .proof-bar {
-  background: repeating-linear-gradient(
-      45deg,
-      white,
-      white 5px,
-      lightgray 5px,
-      lightgray 10px
-    )
-    fixed;
+  background: #f5f5f5;
+  width: 48px;
+}
+
+.proof-bar-form {
+  position: relative;
 }
 
 .proof-bar-proved {
-  background: lightgreen;
+  background: green;
 }
 
 .proof-bar-error {
   background: lightpink;
 }
 
-.proof-bar:hover .proof-bar-form {
+.proof-bar:hover .proof-bar-form:not(.proof-bar-proved),
+.proof-bar:hover .proof-bar-form:not(.proof-bar-proved)::after {
   background: lightgreen;
 }
 
-.proof-bar:hover .cm-gutterElement:hover ~ .cm-gutterElement .proof-bar-form {
+.proof-bar:hover .proof-bar-form:not(.proof-bar-proved)::after {
+  content: "";
+  width: 48px;
+  height: 48px;
+  position: absolute;
+  top: calc(100% - 48px / 2);
+  transform: scaleY(0.25) rotate(45deg);
+}
+
+.proof-bar:hover
+  .cm-gutterElement:hover
+  ~ .cm-gutterElement
+  .proof-bar-form:not(.proof-bar-proved),
+.proof-bar:hover
+  .cm-gutterElement:hover
+  ~ .cm-gutterElement
+  .proof-bar-form:not(.proof-bar-proved)::after {
   background: transparent;
+}
+
+.read-only {
+  /* Override cm-currentLine */
+  background: lightgray !important;
 }
 
 input {

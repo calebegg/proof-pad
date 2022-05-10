@@ -25,7 +25,7 @@ import {
   faUpload,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 export function Toolbar({
   editorView,
@@ -40,18 +40,30 @@ export function Toolbar({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    function handler(e: KeyboardEvent) {
+      if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        download();
+      }
+    }
+    window.addEventListener("keydown", handler);
+    return () => {
+      window.removeEventListener("keydown", handler);
+    };
+  }, []);
+
+  function download() {
+    const element = document.createElement("a");
+    const file = new Blob([value]);
+    element.href = URL.createObjectURL(file);
+    element.download = "code.lisp";
+    element.click();
+  }
+
   return (
     <div id="toolbar">
-      <button
-        aria-label="Save"
-        onClick={() => {
-          const element = document.createElement("a");
-          const file = new Blob([value]);
-          element.href = URL.createObjectURL(file);
-          element.download = "code.lisp";
-          element.click();
-        }}
-      >
+      <button aria-label="Save" onClick={download}>
         <FontAwesomeIcon icon={faSave} />
       </button>
       <input
