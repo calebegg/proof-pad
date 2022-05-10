@@ -12,12 +12,37 @@ expression {
 }
 
 Macro { @specialize<Identifier,
-    "defun" | "defthm" | "if" | "cond" | "declare" | "xargs" | "let" | "mv-let"
+    "cond" |
+    "declare" |
+    "defproperty" |
+    "defthm" |
+    "defun" |
+    "if" |
+    "let" |
+    "let*" |
+    "mv-let" |
+    "xargs"
   > }
 
 Builtin { @specialize<Identifier,
-    "cons" | "car" | "cdr" | "first" | "rest" | "=" | "<" | ">" | "<=" | ">=" |
-    "mv" | "list" | "endp" | "zp" | "true-listp" | "implies" | "iff"
+    "<" |
+    "<=" |
+    "=" |
+    ">" |
+    ">=" |
+    "car" |
+    "cdr" |
+    "cons" |
+    "endp" |
+    "first" |
+    "iff" |
+    "implies" |
+    "list" |
+    "mv" |
+    "or" |
+    "rest" |
+    "true-listp" |
+    "zp"
   > }
 
 Literal { @specialize<Identifier, "t" | "nil"> }
