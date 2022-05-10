@@ -1,23 +1,37 @@
 @top Program { expression* }
 
 expression {
-  Keyword |
+  Macro |
+  Builtin |
+  Literal |
   Identifier |
   String |
   Symbol |
+  Number |
   Application { "(" expression* ")" }
 }
 
-Keyword { @specialize<Identifier, "defun" | "defthm" | "if" | "cond"> }
+Macro { @specialize<Identifier,
+    "defun" | "defthm" | "if" | "cond" | "declare" | "xargs" | "let" | "mv-let"
+  > }
+
+Builtin { @specialize<Identifier,
+    "cons" | "car" | "cdr" | "first" | "rest" | "=" | "<" | ">" | "<=" | ">=" |
+    "mv" | "list" | "endp" | "zp" | "true-listp" | "implies" | "iff"
+  > }
+
+Literal { @specialize<Identifier, "t" | "nil"> }
 
 @tokens {
-  Identifier { $[a-zA-Z0-9:&-]+ }
+  Identifier { $[a-zA-Z&<>-]$[0-9a-zA-Z:&<>-]* }
+
+  Number { $[0-9.]$[0-9./]* }
 
   String { '"' (!["\\] | "\\" _)* '"' }
 
   LineComment { ";" ![\n]* }
 
-  Symbol { "'" $[a-zA-Z0-9:&-]+ }
+  Symbol { $[':]$[a-zA-Z0-9:&-]+ }
 
   space { $[ \t\n\r]+ }
 

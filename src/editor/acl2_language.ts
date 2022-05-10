@@ -1,22 +1,26 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { parser } from "../../grammar/acl2";
-import { completeFromList } from "@codemirror/autocomplete";
-import { indentNodeProp } from "@codemirror/language";
-import { LRLanguage } from "@codemirror/language";
-import { LanguageSupport } from "@codemirror/language";
-import { styleTags, tags } from "@lezer/highlight";
+import {
+  indentNodeProp,
+  LanguageSupport,
+  LRLanguage,
+} from "@codemirror/language";
+import { styleTags, tags as t } from "@lezer/highlight";
 
 const acl2Language = LRLanguage.define({
   parser: parser.configure({
     props: [
       styleTags({
-        Identifier: tags.variableName,
-        String: tags.string,
-        LineComment: tags.lineComment,
-        Symbol: tags.literal,
-        Keyword: tags.keyword,
-        "( )": tags.paren,
+        "( )": t.paren,
+        Builtin: t.standard(t.name),
+        Identifier: t.variableName,
+        LineComment: t.lineComment,
+        Literal: t.literal,
+        Macro: t.keyword,
+        Number: t.literal,
+        String: t.string,
+        Symbol: t.literal,
       }),
       indentNodeProp.add({
         Application: (context) =>
