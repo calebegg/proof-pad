@@ -107,6 +107,8 @@ class FormMarker extends GutterMarker {
       div.classList.add("proof-bar-pending");
     } else if (this.index === provedThrough + 1 && view.state.field(ERROR)) {
       div.classList.add("proof-bar-error");
+    } else {
+      div.classList.add("proof-bar-unproved");
     }
     div.style.width = "100%";
     div.style.height =

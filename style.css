@@ -117,6 +117,10 @@ main > :last-child {
   background: green;
 }
 
+.proof-bar-proved::before {
+  content: "p";
+}
+
 .proof-bar-pending {
   background: gray;
 }
@@ -125,14 +129,12 @@ main > :last-child {
   background: lightpink;
 }
 
-.proof-bar:hover .proof-bar-form:not(.proof-bar-proved):not(.proof-bar-pending),
-.proof-bar:hover
-  .proof-bar-form:not(.proof-bar-proved):not(.proof-bar-pending)::after {
+.proof-bar:hover .proof-bar-unproved,
+.proof-bar:hover .proof-bar-unproved::after {
   background: lightgreen;
 }
 
-.proof-bar:hover
-  .proof-bar-form:not(.proof-bar-proved):not(.proof-bar-pending)::after {
+.proof-bar:hover .proof-bar-unproved::after {
   content: "";
   width: 48px;
   height: 48px;
@@ -144,11 +146,11 @@ main > :last-child {
 .proof-bar:hover
   .cm-gutterElement:hover
   ~ .cm-gutterElement
-  .proof-bar-form:not(.proof-bar-proved):not(.proof-bar-pending),
+  .proof-bar-unproved,
 .proof-bar:hover
   .cm-gutterElement:hover
   ~ .cm-gutterElement
-  .proof-bar-form:not(.proof-bar-proved):not(.proof-bar-pending)::after {
+  .proof-bar-unproved::after {
   background: transparent;
 }
 
