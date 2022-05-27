@@ -81,7 +81,10 @@ const ERROR = StateField.define<boolean>({
   },
   update(v, t) {
     if (t.docChanged) return false;
-    return v || t.effects.filter((e) => e.is(PROOF_ERROR)).length > 0;
+    return (
+      (v && t.effects.filter((e) => e.is(RESET)).length === 0) ||
+      t.effects.filter((e) => e.is(PROOF_ERROR)).length > 0
+    );
   },
 });
 
@@ -165,6 +168,7 @@ export function proofBar(onOutput: (response: Acl2Response) => void) {
               evaluateAll(e.value, vu.view.dispatch);
             } else if (e.is(RESET)) {
               reset();
+              xxx;
             } else if (e.is(NEW_FORM_PROVEN) || e.is(PROOF_ERROR)) {
               onOutput(e.value);
             }
