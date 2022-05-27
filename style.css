@@ -106,11 +106,19 @@ main > :last-child {
 
 .proof-bar {
   background: #f5f5f5;
-  width: 48px;
+  width: 56px;
 }
 
 .proof-bar-form {
   position: relative;
+}
+
+.proof-bar-form::before {
+  content: "";
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: calc(50% - 6px);
 }
 
 .proof-bar-proved {
@@ -118,15 +126,23 @@ main > :last-child {
 }
 
 .proof-bar-proved::before {
-  content: "p";
+  content: "✓";
 }
 
 .proof-bar-pending {
   background: gray;
 }
 
+.proof-bar-pending::before {
+  content: "🗘";
+}
+
 .proof-bar-error {
   background: lightpink;
+}
+
+.proof-bar-error::before {
+  content: "✖";
 }
 
 .proof-bar:hover .proof-bar-unproved,
