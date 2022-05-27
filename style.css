@@ -119,6 +119,7 @@ main > :last-child {
   position: absolute;
   top: 50%;
   left: calc(50% - 6px);
+  font-weight: bold;
 }
 
 .proof-bar-proved {
