@@ -168,7 +168,6 @@ export function proofBar(onOutput: (response: Acl2Response) => void) {
               evaluateAll(e.value, vu.view.dispatch);
             } else if (e.is(RESET)) {
               reset();
-              xxx;
             } else if (e.is(NEW_FORM_PROVEN) || e.is(PROOF_ERROR)) {
               onOutput(e.value);
             }
