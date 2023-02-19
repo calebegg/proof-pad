@@ -26,7 +26,7 @@ ws.addEventListener("message", onUpdate);
 ws.addEventListener("close", onUpdate);
 
 const queue: Array<[(v: Acl2Response) => void, (v: {}) => void]> = [];
-let unhandledErrorCallback: (e: string) => void = defaultCallback;
+let unhandledErrorCallback: (e: unknown) => void = defaultCallback;
 
 export async function reset() {
   try {
@@ -36,7 +36,7 @@ export async function reset() {
   }
 }
 
-function defaultCallback(e: {}) {
+function defaultCallback(e: unknown) {
   console.warn("No handler for", e);
 }
 
@@ -75,6 +75,6 @@ export async function evaluate(code: string): Promise<Acl2Response> {
   return new Promise((resolver, rejecter) => queue.push([resolver, rejecter]));
 }
 
-export function listenForUnhandledError(cb: (error: string) => void) {
+export function listenForUnhandledError(cb: (error: unknown) => void) {
   unhandledErrorCallback = cb;
 }
