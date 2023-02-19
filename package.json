@@ -9,9 +9,10 @@
     "@types/react": "^17.0.44",
     "@types/react-dom": "^17.0.15",
     "gts": "^3.1.0",
-    "parcel": "^2.0.0-nightly.425",
+    "parcel": "^2.8.3",
     "process": "^0.11.10",
-    "typescript": "^4.0.3"
+    "typescript": "^4.0.3",
+    "@lmdb/lmdb-linux-x64": "^2.7.9"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^0.20.0",
@@ -27,7 +28,6 @@
     "@lezer/highlight": "^0.16.0",
     "@lezer/lr": "^0.16.2",
     "@mdx-js/react": "^1.6.22",
-    "lezer": "^0.13.5",
     "react": "^17.0.0",
     "react-dom": "^17.0.2"
   },
