@@ -220,7 +220,7 @@ export function proofBar(onOutput: (response: Acl2Response) => void) {
       },
     ),
     EditorState.changeFilter.from(PROVED_THROUGH, (value) => {
-      return () => [0, forms[value + 1]?.from ?? forms[value].to];
+      return () => [0, forms[value + 1]?.from ?? forms[value]?.to ?? 0];
     }),
     gutter({
       class: "proof-bar",
