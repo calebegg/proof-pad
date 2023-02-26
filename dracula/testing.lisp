@@ -1,3 +1,4 @@
+(in-package "ACL2")
 
 (defmacro check-expect (form1 form2 &key (equiv 'equal))
   `(with-output
