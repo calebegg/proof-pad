@@ -16,11 +16,10 @@ This is not an official Google product.
 
 ## Deploying the backend
 
-1. [Download ACL2](http://acl2s.ccs.neu.edu/acl2s/src/acl2/)
-1. Unzip to ./acl2_image
+1. Update the ACL2 version in the Dockerfile if necessary.
 1. Run:
-
-```shell
-$ docker build -t gcr.io/proof-pad/acl2:v3 .
-$ gcloud docker -- push gcr.io/proof-pad/acl2:v3
-```
+   ```shell
+   $ gcloud builds submit --project=proof-pad --tag=us-central1-docker.pkg.dev/proof-pad/acl2/acl2 --timeout=86400s --machine-type=N1_HIGHCPU_8 .
+   ```
+   This takes about 30 minutes. If your terminal disconnects, check https://console.cloud.google.com/cloud-build/builds?project=proof-pad for the status
+1. Go to [this page](https://console.cloud.google.com/run/deploy/us-central1/acl2?project=proof-pad) and deploy a new revision with the build.

@@ -20,13 +20,10 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net"
 	"net/http"
 	"os"
 	"os/exec"
-	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -34,15 +31,6 @@ import (
 	"cloud.google.com/go/logging"
 	"github.com/gorilla/websocket"
 )
-
-var postface = regexp.MustCompile(
-	`\(NIL (.*) ACL2_INVISIBLE::\|The Live State Itself\|\)$`)
-var cruft = regexp.MustCompile(strings.Join([]string{
-	`^ACL2 Error in TOP-LEVEL:  `,
-	`See :DOC ASSIGN and :DOC @\.$`,
-	`^Error during read-command:\n`,
-}, "|"))
-var id = 0 // Incrementing ID for sockets
 
 // Stats for /health
 var started = time.Now()
@@ -69,22 +57,14 @@ func (i *stats) duration() time.Duration {
 }
 
 var instanceStates = make(map[*exec.Cmd]*stats)
-var totalRuntime time.Duration
-var commandCount int
 
 var ilog func(string, ...interface{})
 var elog func(string, ...interface{})
 var logger *logging.Logger
 
-type response struct {
-	Kind string
-	Body string
-}
+const prompt = "\nanUnlikelyStringThatWillNotOccurInUserCodeA39FC0EFB5F42A9EA6B93AC9951A4F838531FEAE79A073DE55E6777A9C864F01\n"
 
-const timeout = 15 // Kill ACL2 if it takes longer than timeout seconds
-
-func killAndCleanUp(cmd *exec.Cmd, socketName string) {
-	defer os.Remove(socketName)
+func killAndCleanUp(cmd *exec.Cmd) {
 	if cmd.ProcessState != nil && cmd.ProcessState.Exited() {
 		instanceStates[cmd].running = stopped
 		return
@@ -127,7 +107,7 @@ func acl2(w http.ResponseWriter, r *http.Request) {
 	}
 	defer wc.Close()
 
-	cmd := exec.Command("./acl2_image/run_acl2")
+	cmd := exec.Command("./acl2-8.5/saved_acl2")
 	instanceStates[cmd] = &stats{started: time.Now(), running: running}
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
@@ -139,128 +119,81 @@ func acl2(w http.ResponseWriter, r *http.Request) {
 		elog("Failed to open stdout pipe: %s", err)
 		return
 	}
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		elog("Failed to open stderr pipe: %s", err)
+		return
+	}
 	if err := cmd.Start(); err != nil {
 		elog("Failed to run ACL2 command: %s", err)
 		return
 	}
-	socketName := fmt.Sprintf("./bridge-%d-%d", os.Getpid(), id)
-	id++
-	io.WriteString(stdin, fmt.Sprintf(`(add-include-book-dir :teachpacks "dracula") (include-book "centaur/bridge/top" :dir :system) (bridge::start "%s")\n`, socketName))
-	defer killAndCleanUp(cmd, socketName)
+	io.WriteString(stdin, fmt.Sprintf(`
+		(add-include-book-dir :teachpacks "dracula")
+        (set-verify-guards-eagerness 0)
+		:set-state-ok t
+		(defttag :ld-prompt)
+		(defun pp-prompt (channel state) (let ((state (princ$ "%s" channel state))) (mv %d state)))
+		(set-ld-verbose nil state)
+		(set-ld-redefinition-action '(:doit . :erase) state)
+		(set-ld-prompt 'pp-prompt state)
+		(defttag nil)
+	`, prompt, len(prompt)))
+	defer killAndCleanUp(cmd)
 	reader := bufio.NewReader(stdout)
 	line := ""
+	promptCount := 0
 	for {
 		line, err = reader.ReadString('\n')
 		if err != nil {
-			elog("Failed to read string from ACL2: %s", err)
+			elog("Partial read from ACL2 stdout: %s\nCause: %s", line, err)
+			reader := bufio.NewReader(stderr)
+			line, err = reader.ReadString('\n')
+			if err != nil {
+				elog("Partial read from ACL2 stderr: %s\nCause: %s", line, err)
+				return
+			}
+			elog("Error from ACL2: %s", line)
 			return
 		}
-		if strings.Contains(line, "ACL2 Bridge: Listener thread starting") {
-			ilog("Started bridge, now listening")
-			break
-		}
-	}
-	var c net.Conn
-	for i := 0; i < 10; i++ {
-		c, err = net.Dial("unix", socketName)
-		if err != nil {
-			if i == 9 {
-				elog("Failed to dial socket '%s': %s", socketName, err)
-				wc.WriteJSON(
-					response{Kind: "ERROR", Body: "Failed to start ACL2; try again later."})
-				return
-			}
-			time.Sleep(time.Second / 5)
-			continue
-		}
-		break
-	}
-	defer c.Close()
-
-	in := bufio.NewReader(c)
-	out := bufio.NewWriter(c)
-
-	setup := "(progn (set-ld-verbose nil state) " +
-		"(set-ld-redefinition-action '(:doit . :erase) state) " +
-		"(add-include-book-dir :teachpacks \"dracula\") " +
-		"(set-ld-prompt nil state))\n"
-	out.WriteString(fmt.Sprintf("LISP %d\n", len(setup)-1))
-	out.WriteString(setup)
-	out.Flush()
-
-	first := true
-	eat := true
-
-	var code string
-
-	for {
-		start := time.Now()
-
-		timer := time.AfterFunc(timeout*time.Second, func() {
-			elog("Timed out after %ds while executing: '%s'", timeout, code)
-			wc.WriteJSON(
-				response{Kind: "ERROR", Body: fmt.Sprintf("ACL2 timed out after %d seconds. This could be "+
-					"because of a problem with the Proof Pad backend, or it could mean "+
-					"that code you wrote took too long to complete. Try again later.", timeout)})
-			killAndCleanUp(cmd, socketName)
-		})
-
-		body := ""
-		for {
-			header, err := in.ReadString('\n')
-			if err != nil {
-				elog("Failed to read from ACL2: %s", err)
-				return
-			}
-			parts := strings.Fields(header)
-			if len(parts) != 2 {
-				elog("Expected header from bridge, got '%s'", header)
-				return
-			}
-			command, lengthStr := parts[0], parts[1]
-			length, err := strconv.ParseInt(lengthStr, 10, 64)
-			if err != nil {
-				elog("Couldn't parse body length from header: %s", err)
-				return
-			}
-			buf := make([]byte, length)
-			io.ReadFull(in, buf)
-			in.Discard(1) // Newline
-			body += string(buf)
-			if command == "READY" {
-				if first {
-					first = false
-					continue
-				}
+		ilog("stdout: %s", line)
+		if strings.Contains(line, strings.Trim(prompt, "\n")) {
+			ilog("Saw prompt")
+			promptCount++
+			if promptCount == 2 {
 				break
 			}
 		}
+	}
 
-		if eat {
-			eat = false
-		} else {
-			postfaceContent := postface.FindStringSubmatch(body)
-			responseType := ""
-			if len(postfaceContent) > 0 {
-				responseType = postfaceContent[1]
-			}
-			body = postface.ReplaceAllString(body, "")
-			body = strings.Trim(body, " \n")
-			body = cruft.ReplaceAllString(body, "")
+	go sendLoop(wc, reader)
+	go receiveLoop(wc, stdin)
+}
 
-			kind := "ERROR"
-			if responseType == ":EOF" {
-				kind = "SUCCESS"
+func sendLoop(wc *websocket.Conn, reader *bufio.Reader) {
+	for {
+		body := ""
+		for {
+			line, err := reader.ReadString('\n')
+			if err != nil {
+				elog("Partial read from ACL2 stdout: %s\nCause: %s", line, err)
+				return
 			}
-			wc.WriteJSON(
-				response{Kind: kind, Body: body},
-			)
+			ilog("stdout: %s", line)
+			if strings.Contains(line, strings.Trim(prompt, "\n")) {
+				ilog("Saw prompt")
+				break
+			}
+			body += line
 		}
+		body = strings.Trim(body, "\n")
 
-		timer.Stop()
-		totalRuntime += time.Since(start)
-		commandCount++
+		wc.WriteMessage(websocket.TextMessage, []byte(body))
+	}
+}
 
+func receiveLoop(wc *websocket.Conn, stdin io.WriteCloser) {
+	for {
 		mt, codeBuf, err := wc.ReadMessage()
 		if err != nil {
 			elog("Failed to read from socket: %s", err)
@@ -270,32 +203,20 @@ func acl2(w http.ResponseWriter, r *http.Request) {
 			elog("Unexpected message type: %d", mt)
 			return
 		}
-		code = string(codeBuf)
-		toRun := fmt.Sprintf("(bridge::in-main-thread (ld '(%s)))\n", code)
-		// toRun := fmt.Sprintf("(bridge::in-main-thread %s)\n", code)
-		out.WriteString(fmt.Sprintf("LISP_MV %d\n", len(toRun)-1))
-		out.WriteString(toRun)
-		out.Flush()
+		code := string(codeBuf)
+		ilog("stdin: %s", code)
+		io.WriteString(stdin, code+"\n")
 	}
 }
 
 func health(w http.ResponseWriter, r *http.Request) {
-	var avgTime float64
-	if commandCount != 0 {
-		avgTime = float64(totalRuntime) / float64(time.Duration(commandCount)*time.Second)
-	} else {
-		avgTime = 0
-	}
 	fmt.Fprintf(w, `ok
 Started:        %s
 Up for:         %s
-Total sessions: %d
-Avg runtime:    %f out of %d commands`,
+Total sessions: %d`,
 		started.Format("Jan 2 2006 / 15:04:05 MST"),
 		time.Since(started).String(),
 		len(instanceStates),
-		avgTime,
-		commandCount,
 	)
 	sortedStates := make([]*stats, len(instanceStates))
 	i := 0
@@ -337,5 +258,4 @@ func main() {
 	http.HandleFunc("/acl2", acl2)
 	http.HandleFunc("/health", health)
 	log.Print(http.ListenAndServe("0.0.0.0:"+os.Getenv("PORT"), nil))
-	return
 }

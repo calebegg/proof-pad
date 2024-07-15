@@ -20,7 +20,7 @@ export interface Acl2Response {
   Body: string;
 }
 
-const ws = new WebSocket(`ws:35.227.97.92/acl2`);
+const ws = new WebSocket(`wss://acl2-jbhe53iwqa-uc.a.run.app/acl2`);
 
 ws.addEventListener("message", onUpdate);
 ws.addEventListener("close", onUpdate);
